@@ -1,0 +1,23 @@
+model:
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
+  dtype: "bfloat16"
+  tokenizer: "Qwen/Qwen2.5-0.5B-Instruct"
+  trust_remote_code: true
+  pad_token_id: 0
+
+finetune:
+  mode: "lora"    # "lora" or "full"
+
+lora:
+  enabled: true
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: ["q_proj","k_proj","v_proj","o_proj"]
+
+vllm:
+  enabled: true
+  max_model_len: 4096
+  gpu_memory_utilization: 0.30
+  enforce_eager: true
+  trust_remote_code: true

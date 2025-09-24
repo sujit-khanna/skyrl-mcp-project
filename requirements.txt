@@ -1,0 +1,34 @@
+# Project-local deps only. Install SkyRL from source via uv (see README).
+torch>=2.1.0
+transformers>=4.43.0
+datasets>=2.20.0
+accelerate>=0.29.0
+
+# LoRA
+peft>=0.11.0
+
+# vLLM (for LoRA rollouts; optional for full FT)
+vllm>=0.5.5
+
+# TRL as fallback value-head implementation if skyrl_train doesn't export one
+trl>=0.11.4
+
+# Utilities
+numpy>=1.24.0
+scipy>=1.10.0
+httpx>=0.25.0
+python-dotenv>=1.0.0
+pyyaml>=6.0
+jsonschema>=4.20.0
+tqdm>=4.66.0
+rich>=13.7.0
+typer>=0.9.0
+
+# Monitoring
+wandb>=0.17.0
+tensorboard>=2.15.0
+
+# Dev
+pytest>=8.2.0
+black>=24.8.0
+ruff>=0.5.7

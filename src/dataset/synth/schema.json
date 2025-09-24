@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dependent Dataset Spec (Scenarios -> Tasks)",
+  "type": "object",
+  "required": ["dependent_dataset"],
+  "properties": {
+    "dependent_dataset": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scenario","turns","tasks"],
+        "properties": {
+          "scenario": {"type": "string"},
+          "turns": {"type": "integer", "minimum": 1, "maximum": 20},
+          "limits": {"type": "object"},
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["task_id","complexity","conversation","solution"],
+              "properties": {
+                "task_id": {"type": "string"},
+                "complexity": {"type": "string"},
+                "conversation": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["role","message"],
+                    "properties": {
+                      "role": {"type": "string"},
+                      "message": {"type": "string"}
+                    }
+                  },
+                  "minItems": 1
+                },
+                "solution": {
+                  "type": "object",
+                  "required": ["tool_sequence"],
+                  "properties": {
+                    "tool_sequence": {"type": "array", "items": {"type": "object"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

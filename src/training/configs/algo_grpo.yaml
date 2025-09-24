@@ -1,0 +1,19 @@
+algorithm: "grpo"
+grpo:
+  gamma: 0.99
+  lambda_gae: 0.95
+  clip_ratio: 0.20
+  value_loss_coef: 0.5
+  entropy_coef: 0.00
+  kl_coef: 0.10
+  target_kl: 0.3
+  adaptive_kl: true
+  normalize_advantages: true
+optimization:
+  learning_rate: 5.0e-6
+  gradient_clip: 1.0
+  gradient_accumulation_steps: 8
+training:
+  max_epochs: 3
+  steps_per_epoch: 1000
+  save_frequency: 100

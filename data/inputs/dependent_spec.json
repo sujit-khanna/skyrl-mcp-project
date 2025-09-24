@@ -1,0 +1,48 @@
+{
+  "dependent_dataset": [
+    {
+      "scenario": "demo",
+      "turns": 2,
+      "limits": {
+        "max_servers": 2,
+        "max_tools": 5
+      },
+      "tasks": [
+        {
+          "task_id": "demo_1",
+          "complexity": "simple",
+          "conversation": [
+            {
+              "role": "user",
+              "message": "Get SPY close today and DM me."
+            }
+          ],
+          "solution": {
+            "tool_sequence": [
+              {
+                "step": 1,
+                "server": "yahoo_finance",
+                "tool": "get_yfinance_price_history",
+                "params": {
+                  "ticker": "SPY",
+                  "period": "1d",
+                  "interval": "1d"
+                }
+              },
+              {
+                "step": 2,
+                "server": "slack",
+                "tool": "send_slack_message",
+                "params": {
+                  "channel": "direct",
+                  "user": "@me",
+                  "text": "${step1.close}"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
