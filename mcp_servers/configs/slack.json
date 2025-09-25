@@ -1,0 +1,10 @@
+{
+  "service": "slack",
+  "base_url": "http://127.0.0.1:7005",
+  "tools": {
+    "slack_auth_test": {"path": "/tools/slack_auth_test"},
+    "list_slack_channels": {"path": "/tools/list_slack_channels"},
+    "send_slack_message": {"path": "/tools/send_slack_message"},
+    "get_slack_channel_history": {"path": "/tools/get_slack_channel_history"}
+  }
+}

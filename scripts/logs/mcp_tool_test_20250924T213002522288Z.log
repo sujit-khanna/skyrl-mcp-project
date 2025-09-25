@@ -1,0 +1,1428 @@
+
+Validating tools for service: fmp
+fmp_get_quote response:
+{
+  "ok": true,
+  "data": {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "price": 252.31,
+    "changesPercentage": -0.83324,
+    "change": -2.12,
+    "dayLow": 251.04,
+    "dayHigh": 255.73,
+    "yearHigh": 260.1,
+    "yearLow": 169.21,
+    "marketCap": 3744378800900,
+    "priceAvg50": 225.7436,
+    "priceAvg200": 221.79485,
+    "exchange": "NASDAQ",
+    "volume": 42157958,
+    "avgVolume": 57103496,
+    "open": 255.22,
+    "previousClose": 254.43,
+    "eps": 7.26,
+    "pe": 34.75,
+    "earningsAnnouncement": "2025-10-30T20:00:00.000+0000",
+    "sharesOutstanding": 14840390000,
+    "timestamp": 1758744002
+  },
+  "latency_ms": 0
+}
+- fmp_get_quote: passed
+fmp_get_company_profile response:
+{
+  "ok": true,
+  "data": {
+    "symbol": "AAPL",
+    "price": 252.31,
+    "beta": 1.109,
+    "volAvg": 57103496,
+    "mktCap": 3744378800900,
+    "lastDiv": 1.02,
+    "range": "169.21-260.1",
+    "changes": -2.12,
+    "companyName": "Apple Inc.",
+    "currency": "USD",
+    "cik": "0000320193",
+    "isin": "US0378331005",
+    "cusip": "037833100",
+    "exchange": "NASDAQ Global Select",
+    "exchangeShortName": "NASDAQ",
+    "industry": "Consumer Electronics",
+    "website": "https://www.apple.com",
+    "description": "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple TV, Apple Watch, Beats products, and HomePod. It also provides AppleCare support and cloud services; and operates various platforms, including the App Store that allow customers to discover and download applications and digital content, such as books, music, video, games, and podcasts, as well as advertising services include third-party licensing arrangements and its own advertising platforms. In addition, the company offers various subscription-based services, such as Apple Arcade, a game subscription service; Apple Fitness+, a personalized fitness service; Apple Music, which offers users a curated listening experience with on-demand radio stations; Apple News+, a subscription news and magazine service; Apple TV+, which offers exclusive original content; Apple Card, a co-branded credit card; and Apple Pay, a cashless payment service, as well as licenses its intellectual property. The company serves consumers, and small and mid-sized businesses; and the education, enterprise, and government markets. It distributes third-party applications for its products through the App Store. The company also sells its products through its retail and online stores, and direct sales force; and third-party cellular network carriers, wholesalers, retailers, and resellers. Apple Inc. was founded in 1976 and is headquartered in Cupertino, California.",
+    "ceo": "Timothy D. Cook",
+    "sector": "Technology",
+    "country": "US",
+    "fullTimeEmployees": "164000",
+    "phone": "(408) 996-1010",
+    "address": "One Apple Park Way",
+    "city": "Cupertino",
+    "state": "CA",
+    "zip": "95014",
+    "dcfDiff": 63.12614,
+    "dcf": 188.34626259826587,
+    "image": "https://images.financialmodelingprep.com/symbol/AAPL.png",
+    "ipoDate": "1980-12-12",
+    "defaultImage": false,
+    "isEtf": false,
+    "isActivelyTrading": true,
+    "isAdr": false,
+    "isFund": false
+  },
+  "latency_ms": 0
+}
+- fmp_get_company_profile: passed
+fmp_get_income_statement response:
+{
+  "ok": true,
+  "data": [
+    {
+      "date": "2024-09-28",
+      "symbol": "AAPL",
+      "reportedCurrency": "USD",
+      "cik": "0000320193",
+      "fillingDate": "2024-11-01",
+      "acceptedDate": "2024-11-01 06:01:36",
+      "calendarYear": "2024",
+      "period": "FY",
+      "revenue": 391035000000,
+      "costOfRevenue": 210352000000,
+      "grossProfit": 180683000000,
+      "grossProfitRatio": 0.4620634982,
+      "researchAndDevelopmentExpenses": 31370000000,
+      "generalAndAdministrativeExpenses": 0,
+      "sellingAndMarketingExpenses": 0,
+      "sellingGeneralAndAdministrativeExpenses": 26097000000,
+      "otherExpenses": 0,
+      "operatingExpenses": 57467000000,
+      "costAndExpenses": 267819000000,
+      "interestIncome": 0,
+      "interestExpense": 0,
+      "depreciationAndAmortization": 11445000000,
+      "ebitda": 134661000000,
+      "ebitdaratio": 0.3443707085,
+      "operatingIncome": 123216000000,
+      "operatingIncomeRatio": 0.3151022287,
+      "totalOtherIncomeExpensesNet": 269000000,
+      "incomeBeforeTax": 123485000000,
+      "incomeBeforeTaxRatio": 0.3157901467,
+      "incomeTaxExpense": 29749000000,
+      "netIncome": 93736000000,
+      "netIncomeRatio": 0.2397125577,
+      "eps": 6.11,
+      "epsdiluted": 6.08,
+      "weightedAverageShsOut": 15343783000,
+      "weightedAverageShsOutDil": 15408095000,
+      "link": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/0000320193-24-000123-index.htm",
+      "finalLink": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm"
+    }
+  ],
+  "latency_ms": 0
+}
+- fmp_get_income_statement: passed
+fmp_get_market_gainers response:
+{
+  "ok": true,
+  "data": [
+    {
+      "symbol": "QURE",
+      "name": "uniQure N.V.",
+      "change": 33.84,
+      "price": 47.5,
+      "changesPercentage": 247.7306
+    },
+    {
+      "symbol": "SHFS",
+      "name": "SHF Holdings, Inc.",
+      "change": 4.01,
+      "price": 7.27,
+      "changesPercentage": 123.00613
+    },
+    {
+      "symbol": "NHYB",
+      "name": "Nushares ETF Trust - Nuveen High Yield Corporate Bond ETF",
+      "change": 25.01,
+      "price": 25.01,
+      "changesPercentage": 100
+    },
+    {
+      "symbol": "NXUS",
+      "name": "Nushares ETF Trust - Nuveen International Aggregate Bond ETF",
+      "change": 25.02,
+      "price": 25.02,
+      "changesPercentage": 100
+    },
+    {
+      "symbol": "LAC",
+      "name": "Lithium Americas Corp.",
+      "change": 2.94,
+      "price": 6.01,
+      "changesPercentage": 95.76547
+    },
+    {
+      "symbol": "ATCH",
+      "name": "AtlasClear Holdings, Inc.",
+      "change": 0.27,
+      "price": 0.67,
+      "changesPercentage": 67.5
+    },
+    {
+      "symbol": "RCT",
+      "name": "RedCloud Holdings plc",
+      "change": 0.66,
+      "price": 1.68,
+      "changesPercentage": 64.70588
+    },
+    {
+      "symbol": "SYRA",
+      "name": "Syra Health Corp. Class A Common Stock",
+      "change": 0.039,
+      "price": 0.1,
+      "changesPercentage": 63.93443
+    },
+    {
+      "symbol": "CLPT",
+      "name": "ClearPoint Neuro, Inc.",
+      "change": 7.12,
+      "price": 19.28,
+      "changesPercentage": 58.55263
+    },
+    {
+      "symbol": "CNTM",
+      "name": "ConnectM Technology Solutions, Inc.",
+      "change": 0.108,
+      "price": 0.298,
+      "changesPercentage": 56.84211
+    },
+    {
+      "symbol": "TNFA",
+      "name": "TNF Pharmaceuticals, Inc.",
+      "change": 1.69,
+      "price": 5.2,
+      "changesPercentage": 48.14815
+    },
+    {
+      "symbol": "SLNH",
+      "name": "Soluna Holdings, Inc.",
+      "change": 1.13,
+      "price": 3.5,
+      "changesPercentage": 47.67932
+    },
+    {
+      "symbol": "AKTX",
+      "name": "Akari Therapeutics, Plc",
+      "change": 0.3495,
+      "price": 1.11,
+      "changesPercentage": 45.95661
+    },
+    {
+      "symbol": "AQMS",
+      "name": "Aqua Metals, Inc.",
+      "change": 1.82,
+      "price": 5.87,
+      "changesPercentage": 44.93827
+    },
+    {
+      "symbol": "YAAS",
+      "name": "Youxin Technology Ltd",
+      "change": 0.0315,
+      "price": 0.1062,
+      "changesPercentage": 42.16867
+    },
+    {
+      "symbol": "EZGO",
+      "name": "EZGO Technologies Ltd.",
+      "change": 0.0619,
+      "price": 0.2239,
+      "changesPercentage": 38.20988
+    },
+    {
+      "symbol": "PEPG",
+      "name": "PepGen Inc.",
+      "change": 0.71,
+      "price": 2.66,
+      "changesPercentage": 36.41026
+    },
+    {
+      "symbol": "AIRE",
+      "name": "reAlpha Tech Corp. Common Stock",
+      "change": 0.2517,
+      "price": 0.9521,
+      "changesPercentage": 35.93661
+    },
+    {
+      "symbol": "EUDA",
+      "name": "EUDA Health Holdings Limited",
+      "change": 0.45,
+      "price": 1.85,
+      "changesPercentage": 32.14286
+    },
+    {
+      "symbol": "XPON",
+      "name": "Expion360 Inc.",
+      "change": 0.42,
+      "price": 1.74,
+      "changesPercentage": 31.81818
+    },
+    {
+      "symbol": "LUD",
+      "name": "Luda Technology Group Limited",
+      "change": 3.31,
+      "price": 14.72,
+      "changesPercentage": 29.00964
+    },
+    {
+      "symbol": "BCTXZ",
+      "name": "BriaCell Therapeutics Corp. Warrant",
+      "change": 0.06,
+      "price": 0.28,
+      "changesPercentage": 27.27273
+    },
+    {
+      "symbol": "CDLX",
+      "name": "Cardlytics, Inc.",
+      "change": 0.55,
+      "price": 2.64,
+      "changesPercentage": 26.31579
+    },
+    {
+      "symbol": "ABVE",
+      "name": "Above Food Ingredients Inc. Common Stock",
+      "change": 0.39,
+      "price": 1.88,
+      "changesPercentage": 26.1745
+    },
+    {
+      "symbol": "IONR",
+      "name": "ioneer Ltd",
+      "change": 0.88,
+      "price": 4.41,
+      "changesPercentage": 24.92918
+    },
+    {
+      "symbol": "SDST",
+      "name": "Stardust Power Inc.",
+      "change": 0.67,
+      "price": 3.42,
+      "changesPercentage": 24.36364
+    },
+    {
+      "symbol": "WWR",
+      "name": "Westwater Resources, Inc.",
+      "change": 0.1948,
+      "price": 1,
+      "changesPercentage": 24.19275
+    },
+    {
+      "symbol": "LINK",
+      "name": "Interlink Electronics, Inc.",
+      "change": 2.63,
+      "price": 13.91,
+      "changesPercentage": 23.3156
+    },
+    {
+      "symbol": "ALXO",
+      "name": "ALX Oncology Holdings Inc.",
+      "change": 0.29,
+      "price": 1.55,
+      "changesPercentage": 23.01587
+    },
+    {
+      "symbol": "LXEO",
+      "name": "Lexeo Therapeutics, Inc. Common Stock",
+      "change": 1.19,
+      "price": 6.54,
+      "changesPercentage": 22.24299
+    },
+    {
+      "symbol": "XCUR",
+      "name": "Exicure, Inc.",
+      "change": 0.74,
+      "price": 4.25,
+      "changesPercentage": 21.08262
+    },
+    {
+      "symbol": "CDTX",
+      "name": "Cidara Therapeutics, Inc.",
+      "change": 15.09,
+      "price": 88.58,
+      "changesPercentage": 20.53341
+    },
+    {
+      "symbol": "IAS",
+      "name": "Integral Ad Science Holding Corp.",
+      "change": 1.73,
+      "price": 10.19,
+      "changesPercentage": 20.44917
+    },
+    {
+      "symbol": "FOFO",
+      "name": "Hang Feng Technology Innovation Co., Ltd. Ordinary Shares",
+      "change": 3.24,
+      "price": 19.25,
+      "changesPercentage": 20.23735
+    },
+    {
+      "symbol": "ZONE",
+      "name": "CleanCore Solutions, Inc.",
+      "change": 0.4,
+      "price": 2.38,
+      "changesPercentage": 20.20202
+    },
+    {
+      "symbol": "SLI",
+      "name": "Standard Lithium Ltd.",
+      "change": 0.58,
+      "price": 3.46,
+      "changesPercentage": 20.13889
+    },
+    {
+      "symbol": "OUSTZ",
+      "name": "Ouster, Inc.",
+      "change": 0.0139,
+      "price": 0.0839,
+      "changesPercentage": 19.85714
+    },
+    {
+      "symbol": "CAN",
+      "name": "Canaan Inc.",
+      "change": 0.1468,
+      "price": 0.887,
+      "changesPercentage": 19.83248
+    },
+    {
+      "symbol": "CLCO",
+      "name": "Cool Company Ltd.",
+      "change": 1.54,
+      "price": 9.31,
+      "changesPercentage": 19.81982
+    },
+    {
+      "symbol": "TE",
+      "name": "T1 Energy Inc",
+      "change": 0.36,
+      "price": 2.2,
+      "changesPercentage": 19.56522
+    },
+    {
+      "symbol": "MYND",
+      "name": "Mynd.ai, Inc.",
+      "change": 0.1706,
+      "price": 1.06,
+      "changesPercentage": 19.18147
+    },
+    {
+      "symbol": "CRE",
+      "name": "Cre8 Enterprise Limited Class A Ordinary Shares",
+      "change": 0.13,
+      "price": 0.8098,
+      "changesPercentage": 19.12327
+    },
+    {
+      "symbol": "MTEN",
+      "name": "Mingteng International Corporation Inc.",
+      "change": 1.65,
+      "price": 10.3,
+      "changesPercentage": 19.07514
+    },
+    {
+      "symbol": "REFR",
+      "name": "Research Frontiers Incorporated",
+      "change": 0.27,
+      "price": 1.69,
+      "changesPercentage": 19.01408
+    },
+    {
+      "symbol": "LFWD",
+      "name": "Lifeward Ltd.",
+      "change": 0.1298,
+      "price": 0.8133,
+      "changesPercentage": 18.99049
+    },
+    {
+      "symbol": "SMTK",
+      "name": "SmartKem, Inc.",
+      "change": 0.3,
+      "price": 1.91,
+      "changesPercentage": 18.63354
+    },
+    {
+      "symbol": "AKAN",
+      "name": "Akanda Corp.",
+      "change": 0.675,
+      "price": 4.305,
+      "changesPercentage": 18.59504
+    },
+    {
+      "symbol": "BLNE",
+      "name": "Beeline Holdings, Inc.",
+      "change": 0.67,
+      "price": 4.31,
+      "changesPercentage": 18.40659
+    },
+    {
+      "symbol": "FENG",
+      "name": "Phoenix New Media Limited",
+      "change": 0.48,
+      "price": 3.13,
+      "changesPercentage": 18.11321
+    },
+    {
+      "symbol": "PSQH",
+      "name": "PSQ Holdings, Inc.",
+      "change": 0.42,
+      "price": 2.83,
+      "changesPercentage": 17.42739
+    }
+  ],
+  "latency_ms": 0
+}
+- fmp_get_market_gainers: passed
+fmp_get_market_losers response:
+{
+  "ok": true,
+  "data": [
+    {
+      "symbol": "WOK",
+      "name": "WORK Medical Technology Group Ltd.",
+      "change": -0.7995,
+      "price": 0.1125,
+      "changesPercentage": -87.66447
+    },
+    {
+      "symbol": "FCHL",
+      "name": "Fitness Champs Holdings Limited Common Stock",
+      "change": -0.3745,
+      "price": 0.6955,
+      "changesPercentage": -35
+    },
+    {
+      "symbol": "JZXN",
+      "name": "Jiuzi Holdings, Inc.",
+      "change": -0.53,
+      "price": 1.09,
+      "changesPercentage": -32.71605
+    },
+    {
+      "symbol": "INHD",
+      "name": "Inno Holdings Inc. Common Stock",
+      "change": -0.66,
+      "price": 1.6,
+      "changesPercentage": -29.20354
+    },
+    {
+      "symbol": "ZYBT",
+      "name": "Zhengye Biotechnology Holding Limited",
+      "change": -2.02,
+      "price": 4.97,
+      "changesPercentage": -28.89843
+    },
+    {
+      "symbol": "ATMV",
+      "name": "AlphaVest Acquisition Corp",
+      "change": -4.296,
+      "price": 14.2,
+      "changesPercentage": -23.22664
+    },
+    {
+      "symbol": "CHPGR",
+      "name": "ChampionsGate Acquisition Corporation Rights",
+      "change": -0.045,
+      "price": 0.15,
+      "changesPercentage": -23.07692
+    },
+    {
+      "symbol": "FTEL",
+      "name": "Fitell Corporation",
+      "change": -1.81,
+      "price": 6.65,
+      "changesPercentage": -21.3948
+    },
+    {
+      "symbol": "FGL",
+      "name": "Founder Group Limited Ordinary Shares",
+      "change": -0.28,
+      "price": 1.08,
+      "changesPercentage": -20.58824
+    },
+    {
+      "symbol": "XBP",
+      "name": "XBP Global Holdings, Inc.",
+      "change": -0.191,
+      "price": 0.739,
+      "changesPercentage": -20.53763
+    },
+    {
+      "symbol": "SXTC",
+      "name": "China SXT Pharmaceuticals, Inc.",
+      "change": -0.372,
+      "price": 1.57,
+      "changesPercentage": -19.15551
+    },
+    {
+      "symbol": "YDES",
+      "name": "YD Bio Limited Ordinary Shares",
+      "change": -3.95,
+      "price": 17.11,
+      "changesPercentage": -18.75594
+    },
+    {
+      "symbol": "AYTU",
+      "name": "Aytu BioPharma, Inc.",
+      "change": -0.45,
+      "price": 2.06,
+      "changesPercentage": -17.92829
+    },
+    {
+      "symbol": "SSKN",
+      "name": "STRATA Skin Sciences, Inc.",
+      "change": -0.46,
+      "price": 2.13,
+      "changesPercentage": -17.76062
+    },
+    {
+      "symbol": "ORIS",
+      "name": "Oriental Rise Holdings Limited",
+      "change": -0.0582,
+      "price": 0.2696,
+      "changesPercentage": -17.75473
+    },
+    {
+      "symbol": "FCX",
+      "name": "Freeport-McMoRan Inc.",
+      "change": -7.69,
+      "price": 37.67,
+      "changesPercentage": -16.95326
+    },
+    {
+      "symbol": "FEBO",
+      "name": "Fenbo Holdings Limited Ordinary Shares",
+      "change": -0.1309,
+      "price": 0.6525,
+      "changesPercentage": -16.70922
+    },
+    {
+      "symbol": "HRMY",
+      "name": "Harmony Biosciences Holdings, Inc.",
+      "change": -5.31,
+      "price": 26.76,
+      "changesPercentage": -16.55753
+    },
+    {
+      "symbol": "ZSPC",
+      "name": "zSpace, Inc.",
+      "change": -0.27,
+      "price": 1.37,
+      "changesPercentage": -16.46341
+    },
+    {
+      "symbol": "OKLL",
+      "name": "Defiance Daily Target 2x Long OKLO ETF",
+      "change": -16.74,
+      "price": 85.01,
+      "changesPercentage": -16.45209
+    },
+    {
+      "symbol": "HEPA",
+      "name": "Hepion Pharmaceuticals, Inc.",
+      "change": -0.0095,
+      "price": 0.0505,
+      "changesPercentage": -15.83333
+    },
+    {
+      "symbol": "RKLX",
+      "name": "Defiance Daily Target 2X Long RKLB ETF",
+      "change": -16.43,
+      "price": 88.13,
+      "changesPercentage": -15.71347
+    },
+    {
+      "symbol": "LIMN",
+      "name": "Liminatus Pharma, Inc. Class A Common Stock",
+      "change": -0.25,
+      "price": 1.43,
+      "changesPercentage": -14.88095
+    },
+    {
+      "symbol": "JXG",
+      "name": "JX Luxventure Limited",
+      "change": -0.1462,
+      "price": 0.8638,
+      "changesPercentage": -14.47525
+    },
+    {
+      "symbol": "MCRP",
+      "name": "Micropolis Holding Company",
+      "change": -0.27,
+      "price": 1.63,
+      "changesPercentage": -14.21053
+    },
+    {
+      "symbol": "SDOT",
+      "name": "Sadot Group Inc.",
+      "change": -0.99,
+      "price": 6.02,
+      "changesPercentage": -14.12268
+    },
+    {
+      "symbol": "CURX",
+      "name": "Curanex Pharmaceuticals Inc Common Stock",
+      "change": -0.1331,
+      "price": 0.8669,
+      "changesPercentage": -13.31
+    },
+    {
+      "symbol": "XAGE",
+      "name": "Longevity Health Holdings Inc.",
+      "change": -0.13,
+      "price": 0.86,
+      "changesPercentage": -13.13131
+    },
+    {
+      "symbol": "AREB",
+      "name": "American Rebel Holdings, Inc.",
+      "change": -0.16,
+      "price": 1.07,
+      "changesPercentage": -13.00813
+    },
+    {
+      "symbol": "QMMM",
+      "name": "QMMM Holdings Limited Ordinary Shares",
+      "change": -14,
+      "price": 95,
+      "changesPercentage": -12.84404
+    },
+    {
+      "symbol": "WINT",
+      "name": "Windtree Therapeutics, Inc.",
+      "change": -0.0101,
+      "price": 0.0699,
+      "changesPercentage": -12.625
+    },
+    {
+      "symbol": "UP",
+      "name": "Wheels Up Experience Inc.",
+      "change": -0.29,
+      "price": 2.01,
+      "changesPercentage": -12.6087
+    },
+    {
+      "symbol": "KUKE",
+      "name": "Kuke Music Holding Limited",
+      "change": -0.17,
+      "price": 1.2,
+      "changesPercentage": -12.40876
+    },
+    {
+      "symbol": "SLE",
+      "name": "Super League Enterprise, Inc.",
+      "change": -1.04,
+      "price": 7.47,
+      "changesPercentage": -12.22092
+    },
+    {
+      "symbol": "AMBI",
+      "name": "Ambipar Emergency Response",
+      "change": -0.47,
+      "price": 3.41,
+      "changesPercentage": -12.1134
+    },
+    {
+      "symbol": "STKE",
+      "name": "Sol Strategies Inc. Common Shares",
+      "change": -0.69,
+      "price": 5.01,
+      "changesPercentage": -12.10526
+    },
+    {
+      "symbol": "DVLT",
+      "name": "Datavault AI Inc.",
+      "change": -0.0883,
+      "price": 0.65,
+      "changesPercentage": -11.95991
+    },
+    {
+      "symbol": "MRNO",
+      "name": "Murano Global Investments PLC Ordinary Shares",
+      "change": -0.34,
+      "price": 2.51,
+      "changesPercentage": -11.92982
+    },
+    {
+      "symbol": "BIAF",
+      "name": "bioAffinity Technologies, Inc.",
+      "change": -0.58,
+      "price": 4.29,
+      "changesPercentage": -11.90965
+    },
+    {
+      "symbol": "AGH",
+      "name": "Aureus Greenway Holdings Inc.",
+      "change": -0.27,
+      "price": 2.01,
+      "changesPercentage": -11.84211
+    },
+    {
+      "symbol": "RCAT",
+      "name": "Red Cat Holdings, Inc.",
+      "change": -1.39,
+      "price": 10.38,
+      "changesPercentage": -11.80969
+    },
+    {
+      "symbol": "AXIL",
+      "name": "AXIL Brands, Inc.",
+      "change": -0.8,
+      "price": 6,
+      "changesPercentage": -11.76471
+    },
+    {
+      "symbol": "FAT",
+      "name": "FAT Brands Inc.",
+      "change": -0.27,
+      "price": 2.03,
+      "changesPercentage": -11.73913
+    },
+    {
+      "symbol": "WOR",
+      "name": "Worthington Industries, Inc.",
+      "change": -6.97,
+      "price": 53.29,
+      "changesPercentage": -11.56654
+    },
+    {
+      "symbol": "SGBX",
+      "name": "Safe & Green Holdings Corp.",
+      "change": -1.02,
+      "price": 8,
+      "changesPercentage": -11.3082
+    },
+    {
+      "symbol": "SOC",
+      "name": "Sable Offshore Corp.",
+      "change": -2.73,
+      "price": 21.76,
+      "changesPercentage": -11.14741
+    },
+    {
+      "symbol": "CPOP",
+      "name": "Pop Culture Group Co., Ltd",
+      "change": -0.175,
+      "price": 1.405,
+      "changesPercentage": -11.07595
+    },
+    {
+      "symbol": "RIGL",
+      "name": "Rigel Pharmaceuticals, Inc.",
+      "change": -3.74,
+      "price": 30.28,
+      "changesPercentage": -10.99353
+    },
+    {
+      "symbol": "AEVA",
+      "name": "Aeva Technologies, Inc.",
+      "change": -1.99,
+      "price": 16.18,
+      "changesPercentage": -10.95212
+    },
+    {
+      "symbol": "FBYD",
+      "name": "Falcon's Beyond Global, Inc. Class A Common Stock",
+      "change": -1.47,
+      "price": 11.97,
+      "changesPercentage": -10.9375
+    }
+  ],
+  "latency_ms": 0
+}
+- fmp_get_market_losers: passed
+fmp_search_ticker response:
+{
+  "ok": true,
+  "data": [
+    {
+      "symbol": "APC.F",
+      "name": "Apple Inc.",
+      "currency": "EUR",
+      "stockExchange": "Frankfurt Stock Exchange",
+      "exchangeShortName": "XETRA"
+    },
+    {
+      "symbol": "APC.DE",
+      "name": "Apple Inc.",
+      "currency": "EUR",
+      "stockExchange": "Deutsche B\u00f6rse",
+      "exchangeShortName": "XETRA"
+    },
+    {
+      "symbol": "AAPL.NE",
+      "name": "Apple Inc.",
+      "currency": "CAD",
+      "stockExchange": "CBOE CA",
+      "exchangeShortName": "NEO"
+    },
+    {
+      "symbol": "AAPL.MX",
+      "name": "Apple Inc.",
+      "currency": "MXN",
+      "stockExchange": "Mexican Stock Exchange",
+      "exchangeShortName": "MEX"
+    },
+    {
+      "symbol": "AAPL.DE",
+      "name": "Apple Inc.",
+      "currency": "EUR",
+      "stockExchange": "Deutsche B\u00f6rse",
+      "exchangeShortName": "XETRA"
+    }
+  ],
+  "latency_ms": 0
+}
+- fmp_search_ticker: passed
+fmp_get_stock_news response:
+{
+  "ok": true,
+  "data": [
+    {
+      "symbol": "AAPL",
+      "publishedDate": "2025-09-24 16:05:52",
+      "title": "Intel seeks investment from Apple, Bloomberg News reports",
+      "image": "https://images.financialmodelingprep.com/news/intel-seeks-investment-from-apple-bloomberg-news-reports-20250924.jpg",
+      "site": "reuters.com",
+      "text": "Intel has approached Apple about securing an investment in the struggling chipmaker, Bloomberg News reported on Wednesday, citing people familiar with the matter.",
+      "url": "https://www.reuters.com/business/intel-seeks-investment-apple-bloomberg-news-reports-2025-09-24/"
+    },
+    {
+      "symbol": "AAPL",
+      "publishedDate": "2025-09-24 10:02:57",
+      "title": "Trump's tennis invite from Rolex echoes Apple, Nvidia playbook for currying favor, Warren says",
+      "image": "https://images.financialmodelingprep.com/news/trumps-tennis-invite-from-rolex-echoes-apple-nvidia-playbook-20250924.jpeg",
+      "site": "cnbc.com",
+      "text": "Sen. Elizabeth Warren criticized Swiss watchmaker Rolex in a Wednesday letter to CEO Jean-Frederic Dufour. Warren questioned if Rolex was vying for an exemption to tariffs and if the company was \"taking a page from Apple and Nvidia's playbook.",
+      "url": "https://www.cnbc.com/2025/09/24/elizabeth-warren-trump-rolex-tennis-invite-apple-nvidia.html"
+    },
+    {
+      "symbol": "AAPL",
+      "publishedDate": "2025-09-24 08:04:00",
+      "title": "EU asks Apple, Google and Microsoft what they are doing to tackle finance scams",
+      "image": "https://images.financialmodelingprep.com/news/eu-asks-apple-google-and-microsoft-what-they-are-20250924.jpg",
+      "site": "reuters.com",
+      "text": "Apple , Google and Microsoft have been asked by EU tech regulators about the measures they are taking to prevent their platforms being used for financial scams, underscoring Europe's concern about the cost of online fraud.",
+      "url": "https://www.reuters.com/legal/government/eu-asks-apple-google-microsoft-what-they-are-doing-tackle-finance-scams-2025-09-24/"
+    }
+  ],
+  "latency_ms": 0
+}
+- fmp_get_stock_news: passed
+fmp_get_change_percent response:
+{
+  "ok": true,
+  "data": {
+    "changesPercentage": -0.83324
+  },
+  "latency_ms": 0
+}
+- fmp_get_change_percent: passed
+fmp_get_previous_close response:
+{
+  "ok": true,
+  "data": {
+    "symbol": "AAPL",
+    "price": 252.31,
+    "volume": 42157958
+  },
+  "latency_ms": 0
+}
+- fmp_get_previous_close: passed
+
+Validating tools for service: polygon
+polygon_get_aggs response:
+{
+  "ok": true,
+  "data": {
+    "ticker": "AAPL",
+    "frequency": "daily",
+    "summary": {
+      "records": 6,
+      "high": 257.34,
+      "low": 236.3235,
+      "avg_volume": 80616756.83333333
+    },
+    "recent": [
+      {
+        "timestamp": "2025-09-17T00:00:00",
+        "open": 238.97,
+        "high": 240.1,
+        "low": 237.7301,
+        "close": 238.99,
+        "volume": 46508017
+      },
+      {
+        "timestamp": "2025-09-18T00:00:00",
+        "open": 239.97,
+        "high": 241.2,
+        "low": 236.65,
+        "close": 237.88,
+        "volume": 44249576
+      },
+      {
+        "timestamp": "2025-09-19T00:00:00",
+        "open": 241.225,
+        "high": 246.3,
+        "low": 240.2106,
+        "close": 245.5,
+        "volume": 163741314
+      },
+      {
+        "timestamp": "2025-09-22T00:00:00",
+        "open": 248.3,
+        "high": 256.64,
+        "low": 248.12,
+        "close": 256.08,
+        "volume": 105517416
+      },
+      {
+        "timestamp": "2025-09-23T00:00:00",
+        "open": 255.875,
+        "high": 257.34,
+        "low": 253.58,
+        "close": 254.43,
+        "volume": 60263119
+      }
+    ]
+  },
+  "latency_ms": 100
+}
+- polygon_get_aggs: passed
+polygon_get_news response:
+{
+  "ok": true,
+  "data": [
+    {
+      "title": "Qualcomm RSI Spike Signals Strongest Bullish Momentum in Over a Year",
+      "published_utc": "2025-09-24T20:01:00Z",
+      "description": "Qualcomm's stock is showing strong bullish momentum, with its Relative Strength Index (RSI) reaching its highest level since summer 2024, signaling potential continued growth driven by diversification efforts and attractive valuation.",
+      "article_url": "https://www.investing.com/analysis/qualcomm-rsi-spike-signals-strongest-bullish-momentum-in-over-a-year-200667437"
+    },
+    {
+      "title": "ZAGG Announces the Pro Keys Connect: A Durable, Direct-Connect Keyboard Case for iPad Users",
+      "published_utc": "2025-09-24T12:00:00Z",
+      "description": "ZAGG introduces the Pro Keys Connect, a versatile keyboard and case combo for iPad with USB-C direct connect, integrated trackpad, and drop protection, designed to enhance productivity for mobile users.",
+      "article_url": "https://www.globenewswire.com/news-release/2025/09/24/3155383/24609/en/ZAGG-Announces-the-Pro-Keys-Connect-A-Durable-Direct-Connect-Keyboard-Case-for-iPad-Users.html"
+    },
+    {
+      "title": "10 Charts Investors Can\u2019t Afford to Ignore in Q3 2025",
+      "published_utc": "2025-09-24T09:43:00Z",
+      "description": "A comprehensive market analysis exploring the potential economic scenarios for 2025, highlighting macro risks, potential recession or resurgence, and global market dynamics with a focus on industrial metals, bond yields, and asset valuations.",
+      "article_url": "https://www.investing.com/analysis/top-10-charts-to-watch-in-q3-2025-200667386"
+    }
+  ],
+  "latency_ms": 91
+}
+- polygon_get_news: passed
+polygon_get_ticker_details response:
+{
+  "ok": true,
+  "data": {
+    "request_id": "6169c4738ab836504d28364cfd187fc4",
+    "results": {
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "market": "stocks",
+      "locale": "us",
+      "primary_exchange": "XNAS",
+      "type": "CS",
+      "active": true,
+      "currency_name": "usd",
+      "cik": "0000320193",
+      "composite_figi": "BBG000B9XRY4",
+      "share_class_figi": "BBG001S5N8V8",
+      "market_cap": 3775840427700.0,
+      "phone_number": "(408) 996-1010",
+      "address": {
+        "address1": "ONE APPLE PARK WAY",
+        "city": "CUPERTINO",
+        "state": "CA",
+        "postal_code": "95014"
+      },
+      "description": "Apple is among the largest companies in the world, with a broad portfolio of hardware and software products targeted at consumers and businesses. Apple's iPhone makes up a majority of the firm sales, and Apple's other products like Mac, iPad, and Watch are designed around the iPhone as the focal point of an expansive software ecosystem. Apple has progressively worked to add new applications, like streaming video, subscription bundles, and augmented reality. The firm designs its own software and semiconductors while working with subcontractors like Foxconn and TSMC to build its products and chips. Slightly less than half of Apple's sales come directly through its flagship stores, with a majority of sales coming indirectly through partnerships and distribution.",
+      "sic_code": "3571",
+      "sic_description": "ELECTRONIC COMPUTERS",
+      "ticker_root": "AAPL",
+      "homepage_url": "https://www.apple.com",
+      "total_employees": 164000,
+      "list_date": "1980-12-12",
+      "branding": {
+        "logo_url": "https://api.polygon.io/v1/reference/company-branding/YXBwbGUuY29t/images/2025-04-04_logo.svg",
+        "icon_url": "https://api.polygon.io/v1/reference/company-branding/YXBwbGUuY29t/images/2025-04-04_icon.png"
+      },
+      "share_class_shares_outstanding": 14840390000,
+      "weighted_shares_outstanding": 14840390000,
+      "round_lot": 100
+    },
+    "status": "OK"
+  },
+  "latency_ms": 69
+}
+- polygon_get_ticker_details: passed
+polygon_get_market_status response:
+{
+  "ok": true,
+  "data": {
+    "afterHours": true,
+    "currencies": {
+      "crypto": "open",
+      "fx": "open"
+    },
+    "earlyHours": false,
+    "exchanges": {
+      "nasdaq": "extended-hours",
+      "nyse": "extended-hours",
+      "otc": "closed"
+    },
+    "indicesGroups": {
+      "s_and_p": "open",
+      "societe_generale": "open",
+      "msci": "open",
+      "ftse_russell": "open",
+      "mstar": "open",
+      "mstarc": "open",
+      "cccy": "open",
+      "cgi": "open",
+      "nasdaq": "open",
+      "dow_jones": "closed"
+    },
+    "market": "extended-hours",
+    "serverTime": "2025-09-24T17:30:02-04:00"
+  },
+  "latency_ms": 84
+}
+- polygon_get_market_status: passed
+polygon_get_previous_close response:
+{
+  "ok": true,
+  "data": {
+    "ticker": "AAPL",
+    "queryCount": 1,
+    "resultsCount": 1,
+    "adjusted": true,
+    "results": [
+      {
+        "T": "AAPL",
+        "v": 60275187.0,
+        "vw": 255.1677,
+        "o": 255.875,
+        "c": 254.43,
+        "h": 257.34,
+        "l": 253.58,
+        "t": 1758657600000,
+        "n": 673983
+      }
+    ],
+    "status": "OK",
+    "request_id": "aeb31ab7d660a655037dfa1970afb607",
+    "count": 1
+  },
+  "latency_ms": 80
+}
+- polygon_get_previous_close: passed
+
+Validating tools for service: python
+execute_python response:
+{
+  "ok": true,
+  "output": "",
+  "result": 42,
+  "latency_ms": 0
+}
+- execute_python: passed
+process_mcp_data response:
+{
+  "ok": true,
+  "output": "",
+  "result": 6,
+  "latency_ms": 0
+}
+- process_mcp_data: passed
+store_execution_result response:
+{
+  "ok": true,
+  "message": "Stored context 'mcp_test_4430ef4993e14e39ac1d187b4aea3353'",
+  "latency_ms": 0
+}
+- store_execution_result: passed
+get_execution_context response:
+{
+  "ok": true,
+  "data": {
+    "status": "stored"
+  },
+  "latency_ms": 0
+}
+- get_execution_context: passed
+
+Validating tools for service: slack
+slack_auth_test response:
+{
+  "ok": true,
+  "data": {
+    "ok": true,
+    "url": "https://talos-world.slack.com/",
+    "team": "Talos",
+    "user": "mcp_integration_bot",
+    "team_id": "T018MD20JMT",
+    "user_id": "U0974TJ2ZQQ",
+    "bot_id": "B0974THQPJL",
+    "is_enterprise_install": false
+  },
+  "latency_ms": 107
+}
+- slack_auth_test: passed
+list_slack_channels response:
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "C018G2H8Q94",
+      "name": "general",
+      "is_channel": true,
+      "num_members": 2
+    },
+    {
+      "id": "C018V021N3E",
+      "name": "random",
+      "is_channel": true,
+      "num_members": 2
+    },
+    {
+      "id": "C0191CZES73",
+      "name": "algorithms",
+      "is_channel": true,
+      "num_members": 2
+    }
+  ],
+  "latency_ms": 113
+}
+- list_slack_channels: passed
+send_slack_message response:
+{
+  "ok": true,
+  "data": {
+    "ok": true,
+    "channel": "C018G2H8Q94",
+    "ts": "1758749403.432699",
+    "message": {
+      "user": "U0974TJ2ZQQ",
+      "type": "message",
+      "ts": "1758749403.432699",
+      "bot_id": "B0974THQPJL",
+      "app_id": "A096G1ETAN6",
+      "text": "SkyRL MCP comprehensive test at 2025-09-24T21:30:03.286448+00:00",
+      "team": "T018MD20JMT",
+      "bot_profile": {
+        "id": "B0974THQPJL",
+        "app_id": "A096G1ETAN6",
+        "user_id": "U0974TJ2ZQQ",
+        "name": "MCP Integration Bot",
+        "icons": {
+          "image_36": "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png",
+          "image_48": "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png",
+          "image_72": "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+        },
+        "deleted": false,
+        "updated": 1752849739,
+        "team_id": "T018MD20JMT"
+      },
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "ZMm",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "SkyRL MCP comprehensive test at 2025-09-24T21:30:03.286448+00:00"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "latency_ms": 161
+}
+- send_slack_message: passed
+get_slack_channel_history response:
+{
+  "ok": true,
+  "data": [
+    {
+      "ts": "1758749403.432699",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP comprehensive test at 2025-09-24T21:30:03.286448+00:00",
+      "datetime": "2025-09-24T17:30:03.432699"
+    },
+    {
+      "ts": "1758749276.743929",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP comprehensive test at 2025-09-24T21:27:56.602736+00:00",
+      "datetime": "2025-09-24T17:27:56.743929"
+    },
+    {
+      "ts": "1758748970.570289",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP comprehensive test at 2025-09-24T21:22:50.430885+00:00",
+      "datetime": "2025-09-24T17:22:50.570289"
+    },
+    {
+      "ts": "1758748761.886579",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP comprehensive test at 2025-09-24T21:19:21.746028+00:00",
+      "datetime": "2025-09-24T17:19:21.886579"
+    },
+    {
+      "ts": "1758734156.542099",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP integration test at 2025-09-24T17:15:56.252695+00:00",
+      "datetime": "2025-09-24T13:15:56.542099"
+    },
+    {
+      "ts": "1758733912.261439",
+      "user": "U0974TJ2ZQQ",
+      "text": "SkyRL MCP integration test at 2025-09-24T17:11:52.015817+00:00",
+      "datetime": "2025-09-24T13:11:52.261439"
+    },
+    {
+      "ts": "1758733589.332299",
+      "user": "U0188256CNB",
+      "text": "Mr Henderson; we've been expecting you.",
+      "datetime": "2025-09-24T13:06:29.332299"
+    },
+    {
+      "ts": "1755385727.036859",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T19:08:47.036859"
+    },
+    {
+      "ts": "1755383592.315849",
+      "user": "U0974TJ2ZQQ",
+      "text": "Please review the alerts and take necessary actions.",
+      "datetime": "2025-08-16T18:33:12.315849"
+    },
+    {
+      "ts": "1755383580.908869",
+      "user": "U0974TJ2ZQQ",
+      "text": "NVDA broke $800!",
+      "datetime": "2025-08-16T18:33:00.908869"
+    },
+    {
+      "ts": "1755383573.137689",
+      "user": "U0974TJ2ZQQ",
+      "text": "NVDA broke $800!",
+      "datetime": "2025-08-16T18:32:53.137689"
+    },
+    {
+      "ts": "1755383555.298609",
+      "user": "U0974TJ2ZQQ",
+      "text": "Please review the current stock price of NVIDIA Corporation ($173.5), which is below the $800 threshold.",
+      "datetime": "2025-08-16T18:32:35.298609"
+    },
+    {
+      "ts": "1755383481.130349",
+      "user": "U0974TJ2ZQQ",
+      "text": "Please review the current stock price of NVIDIA Corporation ($173.5), which is below the $800 threshold.",
+      "datetime": "2025-08-16T18:31:21.130349"
+    },
+    {
+      "ts": "1755381546.072789",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T17:59:06.072789"
+    },
+    {
+      "ts": "1755381494.577829",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T17:58:14.577829"
+    },
+    {
+      "ts": "1755379617.890489",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T17:26:57.890489"
+    },
+    {
+      "ts": "1755379567.431549",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T17:26:07.431549"
+    },
+    {
+      "ts": "1755370269.375789",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T14:51:09.375789"
+    },
+    {
+      "ts": "1755370217.809899",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T14:50:17.809899"
+    },
+    {
+      "ts": "1755369442.353429",
+      "user": "U0974TJ2ZQQ",
+      "text": "AAPL is currently trading at $213.88 :rocket:",
+      "datetime": "2025-08-16T14:37:22.353429"
+    }
+  ],
+  "latency_ms": 187
+}
+- get_slack_channel_history: passed
+
+Validating tools for service: tavily
+tavily_search response:
+{
+  "ok": true,
+  "latency_ms": 1689,
+  "data": {
+    "query": "latest NVIDIA earnings",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://seekingalpha.com/symbol/NVDA/earnings",
+        "title": "NVIDIA Corporation (NVDA) Earnings Dates & Report | Seeking Alpha",
+        "content": "NVDA Latest Quarter's Earnings ; Announce Date. 8/27/2025 ; EPS Normalized Actual. $1.05 (Beat by $0.04) ; EPS GAAP Actual. $1.08 (Beat by $0.14) ; Revenue Actual.",
+        "score": 0.8674071,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.tipranks.com/stocks/nvda/earnings",
+        "title": "Nvidia (NVDA) Earnings Dates, Call Summary & Reports - TipRanks",
+        "content": "Nvidia (NVDA) will release its next earnings report on Nov 18, 2025. Last qtr Nvidia reported \u2015 EPS in relation to $0.492 expected by the market.",
+        "score": 0.8565368,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.investing.com/equities/nvidia-corp-earnings",
+        "title": "NVIDIA (NVDA) Earnings Dates & Reports - Investing.com",
+        "content": "NVIDIA's Q2 2025 EPS of $1.04 beat $1.01 forecast; revenue of $46.7B exceeded $46.1B estimate; stock rose 0.18% in aftermarket trading; Data center revenue",
+        "score": 0.7915799,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.25,
+    "request_id": "4bdee557-4943-49a8-9b2d-b30e90c88698"
+  }
+}
+- tavily_search: passed
+- tavily_extract: skipped (Tavily extract unavailable (plan limit or gateway error))
+All MCP tool smoke tests passed.

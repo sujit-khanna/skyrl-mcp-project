@@ -1,0 +1,8 @@
+{
+  "service": "tavily",
+  "base_url": "http://127.0.0.1:7003",
+  "tools": {
+    "tavily_search": {"path": "/tools/tavily_search"},
+    "tavily_extract": {"path": "/tools/tavily_extract"}
+  }
+}

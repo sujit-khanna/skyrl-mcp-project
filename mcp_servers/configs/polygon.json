@@ -1,0 +1,11 @@
+{
+  "service": "polygon",
+  "base_url": "http://127.0.0.1:7001",
+  "tools": {
+    "polygon_get_aggs": {"path": "/tools/polygon_get_aggs", "method": "POST", "timeout": 30.0},
+    "polygon_get_news": {"path": "/tools/polygon_get_news"},
+    "polygon_get_ticker_details": {"path": "/tools/polygon_get_ticker_details"},
+    "polygon_get_market_status": {"path": "/tools/polygon_get_market_status"},
+    "polygon_get_previous_close": {"path": "/tools/polygon_get_previous_close"}
+  }
+}

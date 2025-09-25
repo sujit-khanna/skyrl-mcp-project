@@ -1,0 +1,10 @@
+{
+  "service": "python",
+  "base_url": "http://127.0.0.1:7004",
+  "tools": {
+    "execute_python": {"path": "/tools/execute_python", "timeout": 60.0},
+    "process_mcp_data": {"path": "/tools/process_mcp_data", "timeout": 60.0},
+    "store_execution_result": {"path": "/tools/store_execution_result"},
+    "get_execution_context": {"path": "/tools/get_execution_context"}
+  }
+}

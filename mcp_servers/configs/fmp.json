@@ -1,0 +1,15 @@
+{
+  "service": "fmp",
+  "base_url": "http://127.0.0.1:7002",
+  "tools": {
+    "fmp_get_quote": {"path": "/tools/fmp_get_quote"},
+    "fmp_get_company_profile": {"path": "/tools/fmp_get_company_profile"},
+    "fmp_get_income_statement": {"path": "/tools/fmp_get_income_statement"},
+    "fmp_get_market_gainers": {"path": "/tools/fmp_get_market_gainers"},
+    "fmp_get_market_losers": {"path": "/tools/fmp_get_market_losers"},
+    "fmp_search_ticker": {"path": "/tools/fmp_search_ticker"},
+    "fmp_get_stock_news": {"path": "/tools/fmp_get_stock_news"},
+    "fmp_get_change_percent": {"path": "/tools/fmp_get_change_percent"},
+    "fmp_get_previous_close": {"path": "/tools/fmp_get_previous_close"}
+  }
+}

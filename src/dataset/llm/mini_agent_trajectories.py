@@ -1,15 +1,23 @@
 from __future__ import annotations
-import os, asyncio, json, pathlib
+
+import asyncio
+import json
+import logging
+import os
+import pathlib
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-def _get_openai_client():
-    try:
-        from openai import AsyncOpenAI
-        if not os.environ.get("OPENAI_API_KEY"):
-            raise RuntimeError("OPENAI_API_KEY not set")
-        return AsyncOpenAI()
-    except Exception as e:
-        raise RuntimeError(f"OpenAI import/initialization failed: {e}")
+from openai import AsyncOpenAI
+
+
+logger = logging.getLogger(__name__)
+
+
+def _get_openai_client() -> AsyncOpenAI:
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise RuntimeError("OPENAI_API_KEY not set")
+    return AsyncOpenAI()
 
 SYSTEM = (
     "You are a tool-planning expert. Given a user task in a domain with known servers/tools, "
@@ -62,51 +70,117 @@ DEFAULT_INVENTORY = {
 def _inventory_str(inv: Dict[str, List[str]]) -> str:
     return "\\n".join([f"- {srv}: {', '.join(tools)}" for srv,tools in inv.items()])
 
-async def plan_for_task(user_prompt: str, inventory: Optional[Dict[str, List[str]]] = None, model: str="gpt-4o-mini", backend: str="responses", max_steps: int=6) -> Dict[str, Any]:
+async def plan_for_task(
+    user_prompt: str,
+    inventory: Optional[Dict[str, List[str]]] = None,
+    model: str = "gpt-5-mini",
+    backend: str = "responses",
+    max_steps: int = 6,
+    reasoning_effort: str = "high",
+) -> Dict[str, Any]:
     client = _get_openai_client()
     inv = inventory or DEFAULT_INVENTORY
     user = USER_TMPL.format(user_prompt=user_prompt, tool_inventory=_inventory_str(inv), max_steps=max_steps)
     if backend == "responses":
         resp = await client.responses.create(
             model=model,
-            input=[{"role":"system","content":SYSTEM},{"role":"user","content":user}],
-            response_format={"type":"json_schema","json_schema": TASK_PLAN_SCHEMA}
+            input=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
+            response_format={"type": "json_schema", "json_schema": TASK_PLAN_SCHEMA},
+            reasoning={"effort": reasoning_effort},
         )
-        out = resp.output[0].content[0].text
-        return json.loads(out)
+        return json.loads(resp.output[0].content[0].text)
     else:
-        tool = {"type":"function","function":{"name":"tool_plan","strict":True,"parameters": TASK_PLAN_SCHEMA["schema"]}}
+        tool = {
+            "type": "function",
+            "function": {"name": "tool_plan", "strict": True, "parameters": TASK_PLAN_SCHEMA["schema"]},
+        }
         resp = await client.chat.completions.create(
             model=model,
-            messages=[{"role":"system","content":SYSTEM},{"role":"user","content":user}],
+            messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
             tools=[tool],
-            tool_choice={"type":"function","function":{"name":"tool_plan"}}
+            tool_choice={"type": "function", "function": {"name": "tool_plan"}},
         )
         return json.loads(resp.choices[0].message.tool_calls[0].function.arguments)
 
-async def enrich_dataset_with_plans(in_path: str, out_path: str, model: str="gpt-4o-mini", backend: str="responses"):
+
+async def enrich_dataset_with_plans(
+    in_path: str,
+    out_path: str,
+    model: str = "gpt-5-mini",
+    backend: str = "responses",
+    overwrite_existing: bool = False,
+    reasoning_effort: str = "high",
+    raw_output_dir: Optional[pathlib.Path] = None,
+) -> int:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    raw_output_dir = raw_output_dir or (
+        pathlib.Path(out_path).parent / "raw_llm_plan_enrichment" / timestamp
+    )
+    raw_output_dir.mkdir(parents=True, exist_ok=True)
+
     src = json.loads(pathlib.Path(in_path).read_text())
-    dst = []
-    for s in src:
-        user_prompt = ""
-        for m in s.get("prompt", []):
-            if m.get("role") == "user":
-                user_prompt = m.get("content",""); break
-        plan = await plan_for_task(user_prompt, model=model, backend=backend)
-        if not s.get("reward_spec",{}).get("ground_truth",{}).get("tool_sequence"):
-            s["reward_spec"]["ground_truth"]["tool_sequence"] = plan["tool_sequence"]
-        dst.append(s)
+    enriched: List[Dict[str, Any]] = []
+
+    for idx, sample in enumerate(src, start=1):
+        user_prompt = next((m.get("content", "") for m in sample.get("prompt", []) if m.get("role") == "user"), "")
+        if not user_prompt:
+            logger.warning("Sample %d missing user prompt; skipping", idx)
+            enriched.append(sample)
+            continue
+
+        reward_spec = sample.get("reward_spec", {})
+        ground_truth = reward_spec.get("ground_truth", {})
+        existing_plan = ground_truth.get("tool_sequence")
+        if existing_plan and not overwrite_existing:
+            enriched.append(sample)
+            continue
+
+        plan = await plan_for_task(
+            user_prompt,
+            model=model,
+            backend=backend,
+            reasoning_effort=reasoning_effort,
+        )
+
+        ground_truth["tool_sequence"] = plan["tool_sequence"]
+        reward_spec["ground_truth"] = ground_truth
+        sample["reward_spec"] = reward_spec
+
+        raw_path = raw_output_dir / f"plan_{idx:04d}.json"
+        raw_path.write_text(json.dumps(plan, indent=2))
+        sample.setdefault("extra_info", {}).setdefault("task_metadata", {})[
+            "plan_raw_output_path"
+        ] = str(raw_path.relative_to(raw_output_dir.parent))
+        sample["extra_info"]["task_metadata"]["plan_generated_at"] = datetime.now(timezone.utc).isoformat()
+
+        enriched.append(sample)
+
     pathlib.Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    pathlib.Path(out_path).write_text(json.dumps(dst, indent=2))
-    return len(dst)
+    pathlib.Path(out_path).write_text(json.dumps(enriched, indent=2))
+    return len(enriched)
 
 if __name__ == "__main__":
-    import argparse, asyncio
-    ap = argparse.ArgumentParser(description="Add/replace tool plans for a SkyRL dataset using LLM planning.")
-    ap.add_argument("--in", dest="in_path", type=str, required=True)
-    ap.add_argument("--out", dest="out_path", type=str, required=True)
-    ap.add_argument("--model", type=str, default="gpt-4o-mini")
-    ap.add_argument("--backend", type=str, choices=["responses","chat"], default="responses")
-    args = ap.parse_args()
-    count = asyncio.run(enrich_dataset_with_plans(args.in_path, args.out_path, args.model, args.backend))
-    print(f"✅ Wrote {count} samples → {args.out_path}")
+    import argparse
+
+    logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s %(message)s")
+
+    parser = argparse.ArgumentParser(description="Add or replace SkyRL tool plans using GPT-5-mini")
+    parser.add_argument("--in", dest="in_path", type=str, required=True)
+    parser.add_argument("--out", dest="out_path", type=str, required=True)
+    parser.add_argument("--model", type=str, default="gpt-5-mini")
+    parser.add_argument("--backend", type=str, choices=["responses", "chat"], default="responses")
+    parser.add_argument("--overwrite", action="store_true", help="Replan even if tool_sequence already exists")
+    parser.add_argument("--reasoning", default="high", help="Reasoning effort level (responses backend)")
+
+    cli_args = parser.parse_args()
+    total = asyncio.run(
+        enrich_dataset_with_plans(
+            in_path=cli_args.in_path,
+            out_path=cli_args.out_path,
+            model=cli_args.model,
+            backend=cli_args.backend,
+            overwrite_existing=cli_args.overwrite,
+            reasoning_effort=cli_args.reasoning,
+        )
+    )
+    print(f"✅ Wrote {total} samples → {cli_args.out_path}")
