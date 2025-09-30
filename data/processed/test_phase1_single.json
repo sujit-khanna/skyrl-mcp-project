@@ -9,13 +9,13 @@
       },
       {
         "role": "user",
-        "content": "Retrieve the latest news and price information for Apple Inc. (AAPL) to analyze its current market sentiment."
+        "content": "Research the current stock price and news for Apple Inc."
       }
     ],
     "reward_spec": {
       "method": "rule",
       "ground_truth": {
-        "task_id": "equities_research_001",
+        "task_id": "equities_research_task_001",
         "complexity": "simple",
         "max_turns": 3,
         "success": {
@@ -135,11 +135,12 @@
             }
           ],
           "final_answer_requirements": {
-            "format": "markdown",
+            "format": "text",
             "must_include": [
-              "latest price",
-              "latest news",
-              "company description",
+              "price",
+              "volume",
+              "changesPercentage",
+              "description",
               "industry",
               "sector"
             ],
@@ -159,7 +160,7 @@
           }
         },
         "final_reference": {
-          "answer_text": "### Company Overview\n- **Company Name**: Apple Inc.\n- **Founded**: 1976\n- **Headquarters**: Cupertino, California\n\n### Description\nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Apple also offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. The company serves consumers, small and mid-sized businesses, and various markets including education and government.\n\n### Industry and Sector\n- **Industry**: Consumer Electronics\n- **Sector**: Technology\n\n### Latest Price\n- **Price**: $254.43\n- **Volume**: 39,443,231\n- **Changes Percentage**: -0.40319\n\n### Latest News\n- **Articles**: No recent articles available.",
+          "answer_text": "Apple Inc. is a company in the Consumer Electronics industry, part of the Technology sector. It designs, manufactures, and markets a range of products including smartphones (iPhone), personal computers (Mac), tablets (iPad), and wearables (Apple Watch, AirPods). The company also offers various services such as Apple Music, Apple TV+, and AppleCare. As of now, the stock price is $254.43, with a trading volume of 39,443,231 and a changes percentage of -0.40319.",
           "facts": {
             "price": 254.43,
             "volume": 39443231,
@@ -197,8 +198,8 @@
           "weights": {
             "coverage": 0.4,
             "grounding": 0.4,
-            "clarity": 0.1,
-            "safety": 0.1
+            "clarity": 0.2,
+            "safety": 0.0
           },
           "target_length_range": [
             50,
@@ -248,8 +249,8 @@
     "extra_info": {
       "task_metadata": {
         "source_task": {
-          "task_id": "equities_research_001",
-          "user_prompt": "Retrieve the latest news and price information for Apple Inc. (AAPL) to analyze its current market sentiment.",
+          "task_id": "equities_research_task_001",
+          "user_prompt": "Research the current stock price and news for Apple Inc.",
           "complexity": "simple",
           "max_turns": 3,
           "tools_available": [
@@ -329,11 +330,12 @@
             }
           ],
           "final_answer_requirements": {
-            "format": "markdown",
+            "format": "text",
             "must_include": [
-              "latest price",
-              "latest news",
-              "company description",
+              "price",
+              "volume",
+              "changesPercentage",
+              "description",
               "industry",
               "sector"
             ],
@@ -355,8 +357,8 @@
             "weights": {
               "coverage": 0.4,
               "grounding": 0.4,
-              "clarity": 0.1,
-              "safety": 0.1
+              "clarity": 0.2,
+              "safety": 0.0
             },
             "target_length_range": [
               50,
@@ -458,7 +460,7 @@
                     "data",
                     "latency_ms"
                   ],
-                  "latency_ms": 282
+                  "latency_ms": 129
                 },
                 "accept_pass": false,
                 "checks": {
@@ -503,7 +505,7 @@
             ]
           },
           "_final_reference": {
-            "answer_text": "### Company Overview\n- **Company Name**: Apple Inc.\n- **Founded**: 1976\n- **Headquarters**: Cupertino, California\n\n### Description\nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Apple also offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. The company serves consumers, small and mid-sized businesses, and various markets including education and government.\n\n### Industry and Sector\n- **Industry**: Consumer Electronics\n- **Sector**: Technology\n\n### Latest Price\n- **Price**: $254.43\n- **Volume**: 39,443,231\n- **Changes Percentage**: -0.40319\n\n### Latest News\n- **Articles**: No recent articles available.",
+            "answer_text": "Apple Inc. is a company in the Consumer Electronics industry, part of the Technology sector. It designs, manufactures, and markets a range of products including smartphones (iPhone), personal computers (Mac), tablets (iPad), and wearables (Apple Watch, AirPods). The company also offers various services such as Apple Music, Apple TV+, and AppleCare. As of now, the stock price is $254.43, with a trading volume of 39,443,231 and a changes percentage of -0.40319.",
             "facts": {
               "price": 254.43,
               "volume": 39443231,
@@ -539,8 +541,8 @@
           },
           "_model": "gpt-4o-mini",
           "_backend": "responses",
-          "_timestamp": "20250930T034950247759Z",
-          "_raw_output_path": "raw_llm/20250930T034950247759Z/task_0001.json"
+          "_timestamp": "20250930T041223329606Z",
+          "_raw_output_path": "raw_llm/20250930T041223329606Z/task_0001.json"
         },
         "tools_available": [
           "polygon_get_aggs",
@@ -551,8 +553,8 @@
         ],
         "model": "gpt-4o-mini",
         "backend": "responses",
-        "generated_at": "20250930T034950247759Z",
-        "raw_output_path": "raw_llm/20250930T034950247759Z/task_0001.json",
+        "generated_at": "20250930T041223329606Z",
+        "raw_output_path": "raw_llm/20250930T041223329606Z/task_0001.json",
         "exec_breadcrumbs": {
           "state_keys": [
             "price",
@@ -610,7 +612,7 @@
                   "data",
                   "latency_ms"
                 ],
-                "latency_ms": 282
+                "latency_ms": 129
               },
               "accept_pass": false,
               "checks": {

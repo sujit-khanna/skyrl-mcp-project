@@ -432,7 +432,7 @@ TASK_SCHEMA = {
                                 "accept_if": {
                                     "type": "array",
                                     "items": {"type": "string"},
-                                    "description": "Conditions like 'len(result) >= 5' or 'url ~= \"^https://\"'"
+                                    "description": "Conditions like 'price is not None', 'len(articles) > 0', or 'url ~= \"^https://\"'"
                                 },
                                 "next_args_from": {
                                     "type": "string",
@@ -954,6 +954,26 @@ async def _one_task(
         task_dict["limits"].get("max_servers", 1),
         len(unique_servers)
     )
+
+    # Step 8: Sanitize accept_if to remove invalid "result" references
+    for st in task_dict["tool_sequence"]:
+        ar = st.get("analysis_requirements", {})
+        if not ar:
+            continue
+        fixed = []
+        for cond in ar.get("accept_if", []):
+            if "result" in cond:
+                # Replace with safer conditions based on extracted variables
+                keys = [e.split("=")[0].strip() if " = " in e else e.split("[")[0].split("{")[0].split(".")[0]
+                        for e in ar.get("extract", [])]
+                if keys:
+                    fixed.extend([f"{k} is not None" for k in keys])
+                else:
+                    fixed.append("True")
+            else:
+                fixed.append(cond)
+        if fixed:
+            ar["accept_if"] = fixed
 
     return task_dict, raw_payload
 
