@@ -5,9 +5,12 @@ Validation script for LLM-generated dataset files.
 Checks for common issues identified in the audit:
 1. accept_if conditions reference undefined variables
 2. Polygon news using wrong extraction path
-3. must_call_tool not using FQDN
-4. Missing judge_rubric fields
-5. Inconsistent state naming
+3. must_call_tool not using FQDN (server.tool format)
+4. Missing judge_rubric fields and schema
+5. grounded_from references non-existent state variables
+6. limits.max_servers inconsistent with actual server count
+7. Final reference completeness
+8. Execution breadcrumbs showing accept_pass failures
 """
 
 import json
@@ -142,6 +145,21 @@ def check_judge_rubric(sample: Dict[str, Any]) -> List[str]:
     if not tlr or not isinstance(tlr, list) or len(tlr) != 2:
         issues.append("judge_rubric.target_length_range must be [min, max]")
 
+    # Check schema is present for LLM-as-a-Judge structured output
+    schema = judge_rub.get("schema")
+    if not schema:
+        issues.append("judge_rubric.schema is missing (required for structured LLM judge output)")
+    else:
+        # Validate schema has required fields
+        if not isinstance(schema, dict):
+            issues.append("judge_rubric.schema must be an object")
+        else:
+            properties = schema.get("properties", {})
+            required_props = ["coverage", "grounding", "clarity", "safety", "total"]
+            for prop in required_props:
+                if prop not in properties:
+                    issues.append(f"judge_rubric.schema.properties missing '{prop}'")
+
     return issues
 
 
@@ -194,6 +212,61 @@ def check_exec_breadcrumbs(sample: Dict[str, Any]) -> List[str]:
     return issues
 
 
+def check_grounded_from(sample: Dict[str, Any]) -> List[str]:
+    """Check that grounded_from variables match actual extracted state keys."""
+    issues = []
+
+    # Get grounded_from from final_answer_requirements
+    far = (
+        sample.get("reward_spec", {})
+        .get("ground_truth", {})
+        .get("analysis_rubric", {})
+        .get("final_answer_requirements", {})
+    )
+    grounded_from = far.get("grounded_from", [])
+
+    # Get actual state keys from execution breadcrumbs
+    exec_bc = sample.get("extra_info", {}).get("task_metadata", {}).get("exec_breadcrumbs", {})
+    state_keys = set(exec_bc.get("state_keys", []))
+
+    if not state_keys and grounded_from:
+        issues.append(
+            "grounded_from specified but no state_keys in exec_breadcrumbs "
+            "(plan may not have executed)"
+        )
+        return issues
+
+    # Check that all grounded_from variables exist in state
+    for var in grounded_from:
+        if var not in state_keys:
+            issues.append(
+                f"grounded_from references '{var}' but it's not in extracted state_keys: {sorted(state_keys)}"
+            )
+
+    return issues
+
+
+def check_max_servers(sample: Dict[str, Any]) -> List[str]:
+    """Check that limits.max_servers matches actual number of servers used."""
+    issues = []
+
+    tool_seq = sample.get("reward_spec", {}).get("ground_truth", {}).get("tool_sequence", [])
+    limits = sample.get("reward_spec", {}).get("ground_truth", {}).get("limits", {})
+
+    # Count unique servers in tool sequence
+    servers_used = {step.get("server") for step in tool_seq if step.get("server")}
+    num_servers = len(servers_used)
+
+    max_servers = limits.get("max_servers", 0)
+
+    if max_servers < num_servers:
+        issues.append(
+            f"limits.max_servers={max_servers} but tool_sequence uses {num_servers} servers: {sorted(servers_used)}"
+        )
+
+    return issues
+
+
 def validate_sample(sample: Dict[str, Any], idx: int) -> List[str]:
     """Run all validation checks on a single sample."""
     all_issues = []
@@ -206,6 +279,8 @@ def validate_sample(sample: Dict[str, Any], idx: int) -> List[str]:
     all_issues.extend([prefix + issue for issue in check_judge_rubric(sample)])
     all_issues.extend([prefix + issue for issue in check_final_reference(sample)])
     all_issues.extend([prefix + issue for issue in check_exec_breadcrumbs(sample)])
+    all_issues.extend([prefix + issue for issue in check_grounded_from(sample)])
+    all_issues.extend([prefix + issue for issue in check_max_servers(sample)])
 
     return all_issues
 
