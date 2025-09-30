@@ -55,14 +55,15 @@ def check_accept_if_variables(sample: Dict[str, Any]) -> List[str]:
         # Check accept_if conditions
         for cond in ar.get("accept_if", []):
             # Extract variable references (simple heuristic)
-            # Look for identifiers that aren't builtins
+            # Look for identifiers that aren't builtins or Python keywords
             builtins = {"len", "str", "int", "float", "bool", "list", "dict"}
+            keywords = {"is", "not", "None", "True", "False", "and", "or", "in"}
 
             # Find all word-like tokens
             tokens = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', cond)
 
             for token in tokens:
-                if token in builtins:
+                if token in builtins or token in keywords:
                     continue
                 if token not in introduced:
                     issues.append(

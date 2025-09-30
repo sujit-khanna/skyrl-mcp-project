@@ -350,11 +350,17 @@ USER_TEMPLATE = (
     "\n"
     "Tool-specific extraction hints (tool responses are auto-unwrapped from {{ok:true, data:{{...}}}} to {{...}}):\n"
     "- polygon_get_news(ticker, limit): Extract 'articles = results[]' (list of news items)\n"
-    "  Example: extract: ['articles = results[]'], then accept_if: ['len(articles) > 0']\n"
+    "  Example: extract: ['articles = results[]'], accept_if: ['len(articles) > 0']\n"
     "- polygon_get_aggs(ticker, from, to, ...): Extract 'aggs = results[]' (list of aggregates)\n"
     "- fmp_get_quote(symbol): Extract 'price', 'volume', 'changesPercentage'\n"
+    "  Example: extract: ['price', 'volume'], accept_if: ['price is not None', 'volume > 0']\n"
     "- fmp_get_company_profile(symbol): Extract 'description', 'industry', 'sector'\n"
+    "  Example: extract: ['description', 'industry'], accept_if: ['description is not None']\n"
     "- tavily_search(query): Extract 'search_results = results[]'\n"
+    "\n"
+    "CRITICAL: accept_if must ONLY reference variables from this step's extract/compute/select.\n"
+    "WRONG: accept_if: ['len(result) > 0'] - 'result' is not a variable\n"
+    "RIGHT: extract: ['price'], accept_if: ['price is not None']\n"
     "\n"
     "Use realistic parameters. Avoid placeholders like 'XXX' or 'TBD'."
 )
@@ -933,6 +939,21 @@ async def _one_task(
     # Step 5: Attach metadata
     task_dict["_exec_out"] = exec_out.to_dict()
     task_dict["_final_reference"] = final_ref
+
+    # Step 6: Fix grounded_from to match actual extracted state keys
+    actual_state_keys = list(exec_out.state.keys())
+    if "final_answer_requirements" in task_dict:
+        task_dict["final_answer_requirements"]["grounded_from"] = actual_state_keys
+
+    # Step 7: Fix limits.max_servers to match actual server count
+    tool_sequence = task_dict.get("tool_sequence", [])
+    unique_servers = {step["server"] for step in tool_sequence if "server" in step}
+    if "limits" not in task_dict:
+        task_dict["limits"] = {}
+    task_dict["limits"]["max_servers"] = max(
+        task_dict["limits"].get("max_servers", 1),
+        len(unique_servers)
+    )
 
     return task_dict, raw_payload
 

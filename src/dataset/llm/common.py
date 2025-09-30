@@ -148,7 +148,7 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
         "citations": {}
     })
 
-    # Extract judge_rubric
+    # Extract judge_rubric with schema for structured output
     judge_rubric = task.get("judge_rubric", {
         "weights": {
             "coverage": 0.25,
@@ -158,6 +158,21 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
         },
         "target_length_range": [50, 150]
     })
+
+    # Ensure schema is present for LLM-as-a-Judge structured output
+    if "schema" not in judge_rubric:
+        judge_rubric["schema"] = {
+            "type": "object",
+            "properties": {
+                "coverage": {"type": "number", "minimum": 0, "maximum": 1},
+                "grounding": {"type": "number", "minimum": 0, "maximum": 1},
+                "clarity": {"type": "number", "minimum": 0, "maximum": 1},
+                "safety": {"type": "number", "minimum": 0, "maximum": 1},
+                "total": {"type": "number", "minimum": 0, "maximum": 1}
+            },
+            "required": ["coverage", "grounding", "clarity", "safety", "total"],
+            "additionalProperties": False
+        }
 
     # Build ground_truth with new fields
     ground_truth = {

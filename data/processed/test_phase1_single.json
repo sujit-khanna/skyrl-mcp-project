@@ -9,13 +9,13 @@
       },
       {
         "role": "user",
-        "content": "Gather information about Apple Inc. (AAPL) including its latest stock price, recent news articles, and a brief company description."
+        "content": "Retrieve the latest news and price information for Apple Inc. (AAPL) to analyze its current market sentiment."
       }
     ],
     "reward_spec": {
       "method": "rule",
       "ground_truth": {
-        "task_id": "equities_research_task_001",
+        "task_id": "equities_research_001",
         "complexity": "simple",
         "max_turns": 3,
         "success": {
@@ -38,7 +38,8 @@
               "compute": [],
               "select": [],
               "accept_if": [
-                "price > 0"
+                "price is not None",
+                "volume > 0"
               ],
               "next_args_from": ""
             }
@@ -78,14 +79,16 @@
               ],
               "compute": [],
               "select": [],
-              "accept_if": [],
+              "accept_if": [
+                "description is not None"
+              ],
               "next_args_from": ""
             }
           }
         ],
         "limits": {
           "max_tools": 3,
-          "max_servers": 1
+          "max_servers": 2
         },
         "analysis_rubric": {
           "steps": [
@@ -99,7 +102,8 @@
               "compute": [],
               "select": [],
               "accept_if": [
-                "price > 0"
+                "price is not None",
+                "volume > 0"
               ],
               "next_args_from": ""
             },
@@ -124,21 +128,29 @@
               ],
               "compute": [],
               "select": [],
-              "accept_if": [],
+              "accept_if": [
+                "description is not None"
+              ],
               "next_args_from": ""
             }
           ],
           "final_answer_requirements": {
             "format": "markdown",
             "must_include": [
-              "latest stock price",
-              "recent news articles",
-              "company description"
+              "latest price",
+              "latest news",
+              "company description",
+              "industry",
+              "sector"
             ],
             "grounded_from": [
               "price",
+              "volume",
+              "changesPercentage",
               "articles",
-              "description"
+              "description",
+              "industry",
+              "sector"
             ],
             "quality_criteria": [
               "no hallucinations",
@@ -147,7 +159,7 @@
           }
         },
         "final_reference": {
-          "answer_text": "### Apple Inc.\n\n**Latest Stock Price:** $254.43  \n**Recent Changes:** -0.40319%  \n\n**Company Description:**  \nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Additionally, Apple offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. Founded in 1976 and headquartered in Cupertino, California, Apple serves consumers, small and mid-sized businesses, and various markets including education and government.",
+          "answer_text": "### Company Overview\n- **Company Name**: Apple Inc.\n- **Founded**: 1976\n- **Headquarters**: Cupertino, California\n\n### Description\nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Apple also offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. The company serves consumers, small and mid-sized businesses, and various markets including education and government.\n\n### Industry and Sector\n- **Industry**: Consumer Electronics\n- **Sector**: Technology\n\n### Latest Price\n- **Price**: $254.43\n- **Volume**: 39,443,231\n- **Changes Percentage**: -0.40319\n\n### Latest News\n- **Articles**: No recent articles available.",
           "facts": {
             "price": 254.43,
             "volume": 39443231,
@@ -185,21 +197,59 @@
           "weights": {
             "coverage": 0.4,
             "grounding": 0.4,
-            "clarity": 0.2,
-            "safety": 0
+            "clarity": 0.1,
+            "safety": 0.1
           },
           "target_length_range": [
             50,
             150
-          ]
+          ],
+          "schema": {
+            "type": "object",
+            "properties": {
+              "coverage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "grounding": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "clarity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "safety": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "coverage",
+              "grounding",
+              "clarity",
+              "safety",
+              "total"
+            ],
+            "additionalProperties": false
+          }
         }
       }
     },
     "extra_info": {
       "task_metadata": {
         "source_task": {
-          "task_id": "equities_research_task_001",
-          "user_prompt": "Gather information about Apple Inc. (AAPL) including its latest stock price, recent news articles, and a brief company description.",
+          "task_id": "equities_research_001",
+          "user_prompt": "Retrieve the latest news and price information for Apple Inc. (AAPL) to analyze its current market sentiment.",
           "complexity": "simple",
           "max_turns": 3,
           "tools_available": [
@@ -211,7 +261,7 @@
           ],
           "limits": {
             "max_tools": 3,
-            "max_servers": 1
+            "max_servers": 2
           },
           "tool_sequence": [
             {
@@ -230,7 +280,8 @@
                 "compute": [],
                 "select": [],
                 "accept_if": [
-                  "price > 0"
+                  "price is not None",
+                  "volume > 0"
                 ],
                 "next_args_from": ""
               }
@@ -270,7 +321,9 @@
                 ],
                 "compute": [],
                 "select": [],
-                "accept_if": [],
+                "accept_if": [
+                  "description is not None"
+                ],
                 "next_args_from": ""
               }
             }
@@ -278,14 +331,20 @@
           "final_answer_requirements": {
             "format": "markdown",
             "must_include": [
-              "latest stock price",
-              "recent news articles",
-              "company description"
+              "latest price",
+              "latest news",
+              "company description",
+              "industry",
+              "sector"
             ],
             "grounded_from": [
               "price",
+              "volume",
+              "changesPercentage",
               "articles",
-              "description"
+              "description",
+              "industry",
+              "sector"
             ],
             "quality_criteria": [
               "no hallucinations",
@@ -296,13 +355,51 @@
             "weights": {
               "coverage": 0.4,
               "grounding": 0.4,
-              "clarity": 0.2,
-              "safety": 0
+              "clarity": 0.1,
+              "safety": 0.1
             },
             "target_length_range": [
               50,
               150
-            ]
+            ],
+            "schema": {
+              "type": "object",
+              "properties": {
+                "coverage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "grounding": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "clarity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "safety": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "total": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "coverage",
+                "grounding",
+                "clarity",
+                "safety",
+                "total"
+              ],
+              "additionalProperties": false
+            }
           },
           "_exec_out": {
             "state_keys": [
@@ -361,7 +458,7 @@
                     "data",
                     "latency_ms"
                   ],
-                  "latency_ms": 129
+                  "latency_ms": 282
                 },
                 "accept_pass": false,
                 "checks": {
@@ -406,7 +503,7 @@
             ]
           },
           "_final_reference": {
-            "answer_text": "### Apple Inc.\n\n**Latest Stock Price:** $254.43  \n**Recent Changes:** -0.40319%  \n\n**Company Description:**  \nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Additionally, Apple offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. Founded in 1976 and headquartered in Cupertino, California, Apple serves consumers, small and mid-sized businesses, and various markets including education and government.",
+            "answer_text": "### Company Overview\n- **Company Name**: Apple Inc.\n- **Founded**: 1976\n- **Headquarters**: Cupertino, California\n\n### Description\nApple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers products such as the iPhone, Mac, iPad, and various wearables including AirPods and Apple Watch. It provides AppleCare support, cloud services, and operates platforms like the App Store for applications and digital content. Apple also offers subscription services including Apple Arcade, Apple Fitness+, Apple Music, Apple News+, and Apple TV+. The company serves consumers, small and mid-sized businesses, and various markets including education and government.\n\n### Industry and Sector\n- **Industry**: Consumer Electronics\n- **Sector**: Technology\n\n### Latest Price\n- **Price**: $254.43\n- **Volume**: 39,443,231\n- **Changes Percentage**: -0.40319\n\n### Latest News\n- **Articles**: No recent articles available.",
             "facts": {
               "price": 254.43,
               "volume": 39443231,
@@ -442,8 +539,8 @@
           },
           "_model": "gpt-4o-mini",
           "_backend": "responses",
-          "_timestamp": "20250930T010921639612Z",
-          "_raw_output_path": "raw_llm/20250930T010921639612Z/task_0001.json"
+          "_timestamp": "20250930T034950247759Z",
+          "_raw_output_path": "raw_llm/20250930T034950247759Z/task_0001.json"
         },
         "tools_available": [
           "polygon_get_aggs",
@@ -454,8 +551,8 @@
         ],
         "model": "gpt-4o-mini",
         "backend": "responses",
-        "generated_at": "20250930T010921639612Z",
-        "raw_output_path": "raw_llm/20250930T010921639612Z/task_0001.json",
+        "generated_at": "20250930T034950247759Z",
+        "raw_output_path": "raw_llm/20250930T034950247759Z/task_0001.json",
         "exec_breadcrumbs": {
           "state_keys": [
             "price",
@@ -513,7 +610,7 @@
                   "data",
                   "latency_ms"
                 ],
-                "latency_ms": 129
+                "latency_ms": 282
               },
               "accept_pass": false,
               "checks": {
