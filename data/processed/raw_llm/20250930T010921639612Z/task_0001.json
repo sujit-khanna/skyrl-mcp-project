@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CLJ9mb5H10VOI3cXovJ3803QbeoMB",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"task_id\":\"equities_research_task_001\",\"user_prompt\":\"Gather information about Apple Inc. (AAPL) including its latest stock price, recent news articles, and a brief company description.\",\"complexity\":\"simple\",\"max_turns\":3,\"tools_available\":[\"polygon_get_aggs\",\"polygon_get_news\",\"fmp_get_quote\",\"fmp_get_company_profile\",\"tavily_search\"],\"limits\":{\"max_tools\":3,\"max_servers\":1},\"tool_sequence\":[{\"step\":1,\"server\":\"fmp\",\"tool\":\"fmp_get_quote\",\"params\":{\"symbol\":\"AAPL\"},\"analysis_requirements\":{\"extract\":[\"price\",\"volume\",\"changesPercentage\"],\"compute\":[],\"select\":[],\"accept_if\":[\"price > 0\"],\"next_args_from\":\"\"}},{\"step\":2,\"server\":\"polygon\",\"tool\":\"polygon_get_news\",\"params\":{\"ticker\":\"AAPL\",\"limit\":5},\"analysis_requirements\":{\"extract\":[\"articles = results[]\"],\"compute\":[],\"select\":[],\"accept_if\":[\"len(articles) > 0\"],\"next_args_from\":\"\"}},{\"step\":3,\"server\":\"fmp\",\"tool\":\"fmp_get_company_profile\",\"params\":{\"symbol\":\"AAPL\"},\"analysis_requirements\":{\"extract\":[\"description\",\"industry\",\"sector\"],\"compute\":[],\"select\":[],\"accept_if\":[],\"next_args_from\":\"\"}}],\"final_answer_requirements\":{\"format\":\"markdown\",\"must_include\":[\"latest stock price\",\"recent news articles\",\"company description\"],\"grounded_from\":[\"price\",\"articles\",\"description\"],\"quality_criteria\":[\"no hallucinations\",\"concise\"]},\"judge_rubric\":{\"weights\":{\"coverage\":0.4,\"grounding\":0.4,\"clarity\":0.2,\"safety\":0},\"target_length_range\":[50,150]}}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759194562,
+  "model": "gpt-4o-mini-2024-07-18",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": "fp_560af6e559",
+  "usage": {
+    "completion_tokens": 362,
+    "prompt_tokens": 1267,
+    "total_tokens": 1629,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  }
+}

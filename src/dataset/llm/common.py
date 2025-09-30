@@ -84,14 +84,21 @@ def _validate_tool_sequence(tool_sequence: Iterable[Dict[str, Any]]) -> List[Dic
             raise ValueError(f"Tool sequence entry {idx} missing 'server' or 'tool'")
         if params is None:
             params = {}
-        normalized.append(
-            {
-                "step": int(step_number),
-                "server": server,
-                "tool": tool,
-                "params": params,
-            }
-        )
+
+        # Build normalized step
+        normalized_step = {
+            "step": int(step_number),
+            "server": server,
+            "tool": tool,
+            "params": params,
+        }
+
+        # Preserve analysis_requirements if present (Phase 1 enhancement)
+        if "analysis_requirements" in step:
+            normalized_step["analysis_requirements"] = step["analysis_requirements"]
+
+        normalized.append(normalized_step)
+
     if not normalized:
         raise ValueError("tool_sequence must contain at least one step")
     return normalized
@@ -112,14 +119,47 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
 
     success_spec = task.get("success") or {}
     if "must_call_tool" not in success_spec and tool_sequence:
-        success_spec = {**success_spec, "must_call_tool": tool_sequence[0]["tool"]}
+        # Use fully qualified tool name (server.tool) for reliability
+        first_step = tool_sequence[0]
+        fqdn = f"{first_step['server']}.{first_step['tool']}"
+        success_spec = {**success_spec, "must_call_tool": fqdn}
 
-    evaluation: Dict[str, Any] | None = None
-    if task.get("evaluation"):
-        evaluation = task["evaluation"]
-    elif task.get("evaluation_rubric"):
-        evaluation = {"rubric": task["evaluation_rubric"]}
+    # Build analysis_rubric from tool_sequence
+    analysis_rubric = {
+        "steps": [
+            {
+                "step": s["step"],
+                **s.get("analysis_requirements", {})
+            }
+            for s in tool_sequence
+        ],
+        "final_answer_requirements": task.get("final_answer_requirements", {
+            "format": "text",
+            "must_include": [],
+            "grounded_from": [],
+            "quality_criteria": []
+        })
+    }
 
+    # Extract final_reference (from execution)
+    final_reference = task.get("_final_reference", {
+        "answer_text": "",
+        "facts": {},
+        "citations": {}
+    })
+
+    # Extract judge_rubric
+    judge_rubric = task.get("judge_rubric", {
+        "weights": {
+            "coverage": 0.25,
+            "grounding": 0.25,
+            "clarity": 0.25,
+            "safety": 0.25
+        },
+        "target_length_range": [50, 150]
+    })
+
+    # Build ground_truth with new fields
     ground_truth = {
         "task_id": task.get("task_id"),
         "complexity": task.get("complexity", "moderate"),
@@ -127,14 +167,15 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
         "success": success_spec,
         "tool_sequence": tool_sequence,
         "limits": task.get("limits", {}),
+        "analysis_rubric": analysis_rubric,
+        "final_reference": final_reference,
+        "judge_rubric": judge_rubric,
     }
 
     reward_spec: Dict[str, Any] = {
         "method": task.get("reward_method", "rule"),
         "ground_truth": ground_truth,
     }
-    if evaluation:
-        reward_spec["evaluation"] = evaluation
 
     metadata = {
         "task_metadata": {
@@ -144,6 +185,7 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
             "backend": task.get("_backend"),
             "generated_at": task.get("_timestamp"),
             "raw_output_path": task.get("_raw_output_path"),
+            "exec_breadcrumbs": task.get("_exec_out", {})
         }
     }
 
