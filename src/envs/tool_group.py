@@ -44,7 +44,26 @@ class MCPToolGroup:
         timeout: Optional[float] = None,
     ) -> ToolCallResult:
         start = time.perf_counter()
-        payload = await self._manager.execute_tool(tool, params, timeout=timeout or self._timeout)
+        effective_timeout = timeout or self._timeout
+        fqdn = f"{server}.{tool}"
+        if hasattr(self._manager, "execute_tool_fqdn"):
+            payload = await self._manager.execute_tool_fqdn(
+                server,
+                tool,
+                params,
+                timeout=effective_timeout,
+            )
+        else:  # pragma: no cover - only for legacy managers
+            try:
+                payload = await self._manager.execute_tool(
+                    server, tool, params, timeout=effective_timeout
+                )
+            except TypeError:
+                payload = await self._manager.execute_tool(
+                    fqdn, params, timeout=effective_timeout
+                )
+        if not isinstance(payload, dict):
+            raise TypeError("ToolManager returned non-dict payload")
         latency_ms = payload.get("latency_ms")
         if latency_ms is None:
             latency_ms = int((time.perf_counter() - start) * 1000)

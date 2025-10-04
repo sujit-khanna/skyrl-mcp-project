@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
 JSON_FENCE = re.compile(r"```(?:json)?\s*(?P<body>\{.*?\})\s*```", re.DOTALL | re.IGNORECASE)
-JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
+# Fallback block should be non-greedy to avoid swallowing neighbouring JSON snippets
+JSON_BLOCK = re.compile(r"\{.*?\}", re.DOTALL)
 TOOL_BLOCK = re.compile(r"<tool>(?P<body>.*?)</tool>", re.DOTALL | re.IGNORECASE)
 NAMED_BLOCK = re.compile(r"<(?P<name>[A-Za-z0-9_:-]+)>(?P<body>.*?)</(?P=name)>", re.DOTALL)
 
@@ -37,16 +38,22 @@ def _load_json(candidate: str) -> Optional[Dict[str, Any]]:
 
 
 def _extract_json_segment(text: str) -> Optional[Dict[str, Any]]:
+    stripped = text.strip()
+    if stripped.startswith("{"):
+        direct = _load_json(stripped)
+        if direct is not None:
+            return direct
     fence = JSON_FENCE.search(text)
     if fence:
         payload = _load_json(fence.group("body"))
         if payload is not None:
             return payload
-    block = JSON_BLOCK.search(text)
-    if block:
-        payload = _load_json(block.group(0))
-        if payload is not None:
-            return payload
+    matches = list(JSON_BLOCK.finditer(text))
+    if matches:
+        for match in sorted(matches, key=lambda m: len(m.group(0)), reverse=True):
+            payload = _load_json(match.group(0))
+            if payload is not None:
+                return payload
     return None
 
 

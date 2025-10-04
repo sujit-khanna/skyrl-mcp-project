@@ -14,6 +14,7 @@ import httpx
 @dataclass(slots=True)
 class ToolRoute:
     service: str
+    tool: str
     method: str
     url: str
     timeout: float
@@ -27,14 +28,21 @@ class ToolRoute:
         if not path:
             raise ValueError(f"Tool {tool_name} missing path")
         timeout = float(spec.get("timeout", 20.0))
-        return cls(service=service, method=method, url=f"{base_url}{path}", timeout=timeout)
+        return cls(service=service, tool=tool_name, method=method, url=f"{base_url}{path}", timeout=timeout)
 
 
 class ToolManager:
     """Routes tool invocations to configured MCP HTTP services."""
 
-    def __init__(self, routes: Mapping[str, ToolRoute], *, client: httpx.AsyncClient | None = None):
+    def __init__(
+        self,
+        routes: Mapping[str, ToolRoute],
+        *,
+        routes_fqdn: Mapping[tuple[str, str], ToolRoute] | None = None,
+        client: httpx.AsyncClient | None = None,
+    ):
         self._routes = dict(routes)
+        self._routes_fqdn = dict(routes_fqdn or {})
         self._client = client or httpx.AsyncClient()
         self._owned_client = client is None
 
@@ -45,6 +53,7 @@ class ToolManager:
             raise FileNotFoundError(f"Config directory not found: {config_dir}")
 
         routes: Dict[str, ToolRoute] = {}
+        routes_fqdn: Dict[tuple[str, str], ToolRoute] = {}
         for file in sorted(config_path.glob("*.json")):
             with file.open("r", encoding="utf-8") as fh:
                 config = json.load(fh)
@@ -54,10 +63,15 @@ class ToolManager:
             if not service or not base_url:
                 raise ValueError(f"Invalid MCP config {file}")
             for tool_name, spec in tools.items():
-                if tool_name in routes:
-                    raise ValueError(f"Duplicate tool mapping: {tool_name}")
-                routes[tool_name] = ToolRoute.from_config(service, base_url, tool_name, spec)
-        return cls(routes)
+                route = ToolRoute.from_config(service, base_url, tool_name, spec)
+                if tool_name in routes and routes[tool_name].service != service:
+                    raise ValueError(f"Duplicate tool mapping for '{tool_name}' across services")
+                routes[tool_name] = route
+                key = (service, tool_name)
+                if key in routes_fqdn:
+                    raise ValueError(f"Duplicate tool mapping for '{service}.{tool_name}'")
+                routes_fqdn[key] = route
+        return cls(routes, routes_fqdn=routes_fqdn)
 
     async def aclose(self) -> None:
         if self._owned_client:
@@ -67,11 +81,32 @@ class ToolManager:
         self, tool_name: str, arguments: Dict[str, Any], timeout: float | None = None
     ) -> Dict[str, Any]:
         if tool_name not in self._routes:
-            return {"ok": False, "error": f"Unknown tool: {tool_name}"}
+            raise KeyError(f"Unknown tool: {tool_name}")
 
         route = self._routes[tool_name]
         request_timeout = timeout if timeout is not None else route.timeout
+        return await self._call_route(route, arguments, request_timeout)
 
+    async def execute_tool_fqdn(
+        self,
+        server: str,
+        tool_name: str,
+        arguments: Dict[str, Any],
+        timeout: float | None = None,
+    ) -> Dict[str, Any]:
+        key = (server, tool_name)
+        if key not in self._routes_fqdn:
+            raise KeyError(f"Unknown tool: {server}.{tool_name}")
+        route = self._routes_fqdn[key]
+        request_timeout = timeout if timeout is not None else route.timeout
+        return await self._call_route(route, arguments, request_timeout)
+
+    async def _call_route(
+        self,
+        route: ToolRoute,
+        arguments: Dict[str, Any],
+        request_timeout: float,
+    ) -> Dict[str, Any]:
         start = time.perf_counter()
         try:
             response = await self._client.request(
@@ -82,20 +117,13 @@ class ToolManager:
             )
             response.raise_for_status()
         except httpx.HTTPError as exc:
-            return {
-                "ok": False,
-                "error": f"HTTP error calling {tool_name}: {exc}",
-            }
+            raise RuntimeError(f"HTTP error calling {route.service}.{route.tool}: {exc}") from exc
 
         latency_ms = int((time.perf_counter() - start) * 1000)
         try:
             payload = response.json()
         except ValueError:
-            return {
-                "ok": False,
-                "error": "Invalid JSON payload returned by service",
-                "latency_ms": latency_ms,
-            }
+            raise RuntimeError("Invalid JSON payload returned by service")
         payload.setdefault("latency_ms", latency_ms)
         return payload
 

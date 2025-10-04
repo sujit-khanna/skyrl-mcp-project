@@ -60,6 +60,7 @@ class EnvironmentConfig:
     tool_timeout: float = 30.0
     allowlist: Optional[Sequence[str]] = None
     auto_close_tool_group: bool = True
+    heuristic_weights: Optional[Dict[str, float]] = None
 
 
 class MCPToolEnv(BaseTextEnv):
@@ -254,7 +255,7 @@ class MCPToolEnv(BaseTextEnv):
 
         acceptance = evaluate_accept_if(analysis.get("accept_if", []), local_state)
 
-        repeated = fqdn in self.state.tool_usage
+        repeated = self.state.has_called_with_params(fqdn, call.params)
         reward, breakdown = step_reward(
             weights=self.config.step_weights,
             extract_directives=extract_directives,
@@ -273,7 +274,12 @@ class MCPToolEnv(BaseTextEnv):
         metadata["accept_failed_conditions"] = acceptance.failed_conditions
         metadata["step_index"] = step_index
 
-        self.state.record_tool_call(call.server, call.tool, result_payload)
+        self.state.record_tool_call(
+            call.server,
+            call.tool,
+            result_payload,
+            params=call.params,
+        )
         self.state.update_facts(updates)
         if step_index is not None:
             self.completed_steps.add(step_index)
@@ -285,7 +291,12 @@ class MCPToolEnv(BaseTextEnv):
     def _handle_final_answer(self, final_text: str) -> Tuple[float, Dict[str, Any]]:
         final_text = final_text.strip()
         far = (self.ground.get("analysis_rubric") or {}).get("final_answer_requirements") or {}
-        heuristic_score, heuristic_breakdown = final_heuristic(final_text, far, self.state.facts)
+        heuristic_score, heuristic_breakdown = final_heuristic(
+            final_text,
+            far,
+            self.state.facts,
+            weights=self.config.heuristic_weights,
+        )
 
         judge_payload = {
             "messages": self._observation(),

@@ -93,7 +93,7 @@ def final_heuristic(
     final_answer_requirements: Mapping[str, Any],
     facts: Mapping[str, Any],
     *,
-    weights: TerminalRewardWeights | None = None,
+    weights: Optional[Dict[str, float]] = None,
 ) -> Tuple[float, Dict[str, float]]:
     far = final_answer_requirements or {}
     must_include = far.get("must_include", [])
@@ -126,8 +126,11 @@ def final_heuristic(
         "grounding": grounding,
         "length": length_ok,
     }
-    # Simple average weighted inside heuristic component
-    heur_score = 0.5 * coverage + 0.4 * grounding + 0.1 * length_ok
+    heur_weights = weights or {}
+    w_cov = heur_weights.get("heur_cov", 0.5)
+    w_grd = heur_weights.get("heur_grd", 0.4)
+    w_len = heur_weights.get("heur_len", 0.1)
+    heur_score = w_cov * coverage + w_grd * grounding + w_len * length_ok
     breakdown["heuristic"] = heur_score
     return heur_score, breakdown
 
