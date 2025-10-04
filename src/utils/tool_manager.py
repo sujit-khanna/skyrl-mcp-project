@@ -39,12 +39,9 @@ class ToolManager:
         routes: Mapping[str, ToolRoute],
         *,
         routes_fqdn: Mapping[tuple[str, str], ToolRoute] | None = None,
-        client: httpx.AsyncClient | None = None,
     ):
         self._routes = dict(routes)
         self._routes_fqdn = dict(routes_fqdn or {})
-        self._client = client or httpx.AsyncClient()
-        self._owned_client = client is None
 
     @classmethod
     def from_config_dir(cls, config_dir: str | Path) -> "ToolManager":
@@ -74,8 +71,7 @@ class ToolManager:
         return cls(routes, routes_fqdn=routes_fqdn)
 
     async def aclose(self) -> None:
-        if self._owned_client:
-            await self._client.aclose()
+        return None
 
     async def execute_tool(
         self, tool_name: str, arguments: Dict[str, Any], timeout: float | None = None
@@ -108,16 +104,17 @@ class ToolManager:
         request_timeout: float,
     ) -> Dict[str, Any]:
         start = time.perf_counter()
-        try:
-            response = await self._client.request(
-                route.method,
-                route.url,
-                json={"arguments": arguments},
-                timeout=request_timeout,
-            )
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
-            raise RuntimeError(f"HTTP error calling {route.service}.{route.tool}: {exc}") from exc
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.request(
+                    route.method,
+                    route.url,
+                    json={"arguments": arguments},
+                    timeout=request_timeout,
+                )
+                response.raise_for_status()
+            except httpx.HTTPError as exc:
+                raise RuntimeError(f"HTTP error calling {route.service}.{route.tool}: {exc}") from exc
 
         latency_ms = int((time.perf_counter() - start) * 1000)
         try:

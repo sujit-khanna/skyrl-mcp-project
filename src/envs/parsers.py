@@ -43,6 +43,12 @@ def _extract_json_segment(text: str) -> Optional[Dict[str, Any]]:
         direct = _load_json(stripped)
         if direct is not None:
             return direct
+    for line in text.splitlines():
+        candidate = line.strip()
+        if candidate.startswith("{") and candidate.endswith("}"):
+            direct = _load_json(candidate)
+            if direct is not None:
+                return direct
     fence = JSON_FENCE.search(text)
     if fence:
         payload = _load_json(fence.group("body"))
