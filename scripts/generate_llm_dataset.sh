@@ -12,11 +12,13 @@ fi
 OUT_PATH=$1
 N_SAMPLES=${N_SAMPLES:-50}
 OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
-OPENAI_BACKEND=${OPENAI_BACKEND:-responses}
+OPENAI_BACKEND=${OPENAI_BACKEND:-chat}
 MAX_TOOLS=${MAX_TOOLS:-5}
 MAX_TURNS=${MAX_TURNS:-8}
 DOMAINS=${DOMAINS:-}
 COMPLEXITIES=${COMPLEXITIES:-}
+PROMPT_FILE=${PROMPT_FILE:-}
+SHUFFLE_PROMPTS=${SHUFFLE_PROMPTS:-0}
 
 ARGS=("${OUT_PATH}" "--n" "${N_SAMPLES}" "--model" "${OPENAI_MODEL}" "--backend" "${OPENAI_BACKEND}" "--max-tools" "${MAX_TOOLS}" "--max-turns" "${MAX_TURNS}")
 
@@ -28,6 +30,13 @@ fi
 if [[ -n "${COMPLEXITIES}" ]]; then
   IFS=',' read -r -a COMPLEXITY_ARRAY <<< "${COMPLEXITIES}"
   ARGS+=("--complexities" "${COMPLEXITY_ARRAY[@]}")
+fi
+
+if [[ -n "${PROMPT_FILE}" ]]; then
+  ARGS+=("--prompt-file" "${PROMPT_FILE}")
+  if [[ "${SHUFFLE_PROMPTS}" == "1" || "${SHUFFLE_PROMPTS}" == "true" ]]; then
+    ARGS+=("--shuffle-prompts")
+  fi
 fi
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)

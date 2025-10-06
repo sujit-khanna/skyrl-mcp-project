@@ -1,0 +1,31 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+Python execution failure
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 144, in safe_execute
+    result = eval(code, env)  # noqa: S307 - restricted env
+             ^^^^^^^^^^^^^^^
+  File "<string>", line 1
+    articles = '[]'
+             ^
+SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 23, in <module>
+  File "<string>", line 4, in infer
+AttributeError: 'str' object has no attribute 'get'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 146, in safe_execute
+    exec(code, env)  # noqa: S102 - restricted env
+    ^^^^^^^^^^^^^^^
+  File "<string>", line 26, in <module>
+NameError: name 'Exception' is not defined

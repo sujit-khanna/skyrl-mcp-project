@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CNTJSZ5Cna3mybJIvvlsxUCn5q9cH",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\n  \"task_id\": \"equities_amd_price_desc_v1\",\n  \"user_prompt\": \"What does AMD do, and what is its current price and 1-day change? Answer in \u2264120 words with one short citation to a source.\",\n  \"complexity\": \"simple\",\n  \"max_turns\": 4,\n  \"tools_available\": [\n    \"polygon_get_aggs\",\n    \"polygon_get_news\",\n    \"fmp_get_quote\",\n    \"fmp_get_income_statement\",\n    \"fmp_get_company_profile\",\n    \"tavily_search\",\n    \"tavily_extract\",\n    \"send_slack_message\",\n    \"list_slack_channels\",\n    \"execute_python\",\n    \"process_mcp_data\"\n  ],\n  \"limits\": {\n    \"max_tools\": 5,\n    \"max_servers\": 5\n  },\n  \"tool_sequence\": [\n    {\n      \"step\": 1,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"AMD\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\"\n        ],\n        \"compute\": [],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\"\n        ]\n      }\n    },\n    {\n      \"step\": 2,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_company_profile\",\n      \"params\": {\n        \"symbol\": \"AMD\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"description\",\n          \"industry\",\n          \"sector\"\n        ],\n        \"compute\": [],\n        \"select\": [],\n        \"accept_if\": [\n          \"description is not None\"\n        ]\n      }\n    }\n  ],\n  \"final_answer_requirements\": {\n    \"format\": \"text\",\n    \"must_include\": [\n      \"company_description\",\n      \"current_price\",\n      \"one_day_change\"\n    ],\n    \"grounded_from\": [\n      \"description\",\n      \"price\",\n      \"changesPercentage\"\n    ],\n    \"quality_criteria\": [\n      \"no hallucinations\",\n      \"concise\",\n      \"<=120 words\",\n      \"include one short citation to a source\"\n    ]\n  },\n  \"judge_rubric\": {\n    \"weights\": {\n      \"coverage\": 0.4,\n      \"grounding\": 0.3,\n      \"clarity\": 0.2,\n      \"safety\": 0.1\n    },\n    \"target_length_range\": [\n      10,\n      120\n    ]\n  }\n}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759710258,
+  "model": "gpt-5-mini-2025-08-07",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 2233,
+    "prompt_tokens": 1565,
+    "total_tokens": 3798,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 1664,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 1408
+    }
+  }
+}

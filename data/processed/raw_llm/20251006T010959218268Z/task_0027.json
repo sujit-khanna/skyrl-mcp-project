@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CNV5ngM8ZnvhJ64ar8mys1ks81E41",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\n  \"task_id\": \"meta_move_today_brief_v1\",\n  \"user_prompt\": \"Draft a brief for a PM: Why did META move today? Include price/% move, two corroborating headlines from different outlets, and a risk/mitigation bullet.\",\n  \"complexity\": \"complex\",\n  \"max_turns\": 8,\n  \"tools_available\": [\n    \"polygon_get_aggs\",\n    \"polygon_get_news\",\n    \"fmp_get_quote\",\n    \"fmp_get_income_statement\",\n    \"fmp_get_company_profile\",\n    \"tavily_search\",\n    \"tavily_extract\",\n    \"send_slack_message\",\n    \"list_slack_channels\",\n    \"execute_python\",\n    \"process_mcp_data\"\n  ],\n  \"limits\": {\n    \"max_tools\": 5,\n    \"max_servers\": 5\n  },\n  \"tool_sequence\": [\n    {\n      \"step\": 1,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"META\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\",\n          \"volume\"\n        ],\n        \"compute\": [\n          \"price_move_pct = changesPercentage\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\",\n          \"volume > 0\"\n        ]\n      }\n    },\n    {\n      \"step\": 2,\n      \"server\": \"polygon\",\n      \"tool\": \"polygon_get_aggs\",\n      \"params\": {\n        \"ticker\": \"META\",\n        \"from\": \"2025-10-05\",\n        \"to\": \"2025-10-06\",\n        \"limit\": 500\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"aggs = results[]\"\n        ],\n        \"compute\": [\n          \"intraday_pct = pct_change_last_day(aggs)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(aggs) > 0\"\n        ]\n      }\n    },\n    {\n      \"step\": 3,\n      \"server\": \"polygon\",\n      \"tool\": \"polygon_get_news\",\n      \"params\": {\n        \"ticker\": \"META\",\n        \"limit\": 10\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"articles = results[]\",\n          \"titles = results[][title]\",\n          \"publishers = results[][publisher]\"\n        ],\n        \"compute\": [\n          \"headline1 = first(titles)\",\n          \"source1 = first(publishers)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(articles) > 0\",\n          \"headline1 is not None\"\n        ]\n      }\n    },\n    {\n      \"step\": 4,\n      \"server\": \"tavily\",\n      \"tool\": \"tavily_search\",\n      \"params\": {\n        \"query\": \"Meta Platforms stock move today\",\n        \"limit\": 10\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"search_results = results[]\",\n          \"urls = search_results[][url]\"\n        ],\n        \"compute\": [\n          \"top_url = first(urls)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(search_results) > 0\",\n          \"top_url is not None\"\n        ],\n        \"next_args_from\": \"top_url\"\n      }\n    },\n    {\n      \"step\": 5,\n      \"server\": \"tavily\",\n      \"tool\": \"tavily_extract\",\n      \"params\": {\n        \"url\": \"${top_url}\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"title\",\n          \"site\",\n          \"content\"\n        ],\n        \"compute\": [\n          \"headline2 = title\",\n          \"site2 = site\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"headline2 is not None\",\n          \"site2 is not None\"\n        ]\n      }\n    }\n  ],\n  \"final_answer_requirements\": {\n    \"format\": \"text\",\n    \"must_include\": [\n      \"price\",\n      \"price_move_pct\",\n      \"headline1\",\n      \"headline2\",\n      \"risk_bullet\"\n    ],\n    \"grounded_from\": [\n      \"price\",\n      \"price_move_pct\",\n      \"headline1\",\n      \"headline2\",\n      \"source1\",\n      \"site2\",\n      \"intraday_pct\"\n    ],\n    \"quality_criteria\": [\n      \"no hallucinations\",\n      \"concise\",\n      \"grounded in cited headlines\"\n    ]\n  },\n  \"judge_rubric\": {\n    \"weights\": {\n      \"coverage\": 0.4,\n      \"grounding\": 0.3,\n      \"clarity\": 0.2,\n      \"safety\": 0.1\n    },\n    \"target_length_range\": [\n      80,\n      200\n    ]\n  }\n}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759717099,
+  "model": "gpt-5-mini-2025-08-07",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 5173,
+    "prompt_tokens": 1813,
+    "total_tokens": 6986,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 4096,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  }
+}

@@ -1,0 +1,7 @@
+[
+  {
+    "id": "E01",
+    "complexity": "easy",
+    "user_prompt": "Give me a two-sentence market snapshot for AAPL today: current price, 1-day % change, and one concise risk from the latest credible headline."
+  }
+]

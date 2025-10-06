@@ -1,0 +1,667 @@
+[
+  {
+    "data_source": "synthetic/llm",
+    "env_class": "MCPToolEnv",
+    "prompt": [
+      {
+        "role": "system",
+        "content": "You are a helpful research assistant operating within the SkyRL multi-tool environment. Always decide whether to call an available tool before responding. When you decide to call a tool, emit JSON of the form {\"tool\":\"name\",\"arguments\":{...}} or the equivalent XML block <tool><name>{...}</name></tool>. Available tools: polygon: polygon_get_aggs, polygon_get_news, fmp: fmp_get_quote, fmp_get_income_statement, fmp_get_company_profile, tavily: tavily_search, tavily_extract, slack: send_slack_message, list_slack_channels, python_execution: execute_python, process_mcp_data, fmp_get_quote, polygon_get_news."
+      },
+      {
+        "role": "user",
+        "content": "Give me a two-sentence market snapshot for AAPL today: current price, 1-day % change, and one concise risk from the latest credible headline."
+      }
+    ],
+    "reward_spec": {
+      "method": "rule",
+      "ground_truth": {
+        "task_id": "skyrl-001-aapl-snapshot",
+        "complexity": "simple",
+        "max_turns": 4,
+        "success": {
+          "must_call_tool": "fmp.fmp_get_quote"
+        },
+        "tool_sequence": [
+          {
+            "step": 1,
+            "server": "fmp",
+            "tool": "fmp_get_quote",
+            "params": {
+              "symbol": "AAPL"
+            },
+            "analysis_requirements": {
+              "extract": [
+                "price",
+                "changesPercentage",
+                "volume"
+              ],
+              "compute": [
+                "pct = changesPercentage"
+              ],
+              "select": [],
+              "accept_if": [
+                "price is not None",
+                "changesPercentage is not None",
+                "volume > 0"
+              ]
+            }
+          },
+          {
+            "step": 2,
+            "server": "polygon",
+            "tool": "polygon_get_news",
+            "params": {
+              "ticker": "AAPL",
+              "limit": 3
+            },
+            "analysis_requirements": {
+              "extract": [
+                "articles = results[]",
+                "titles = results[][title]",
+                "descriptions = results[][description]"
+              ],
+              "compute": [
+                "headline = first(titles)",
+                "desc = first(descriptions)",
+                "matches_headline = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", headline)",
+                "matches_desc = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", desc)",
+                "matches = concat(matches_headline, matches_desc)",
+                "risk_summary = first(matches)"
+              ],
+              "select": [],
+              "accept_if": [
+                "len(articles) > 0",
+                "first(titles) is not None"
+              ]
+            }
+          }
+        ],
+        "limits": {
+          "max_tools": 5,
+          "max_servers": 5
+        },
+        "analysis_rubric": {
+          "steps": [
+            {
+              "step": 1,
+              "extract": [
+                "price",
+                "changesPercentage",
+                "volume"
+              ],
+              "compute": [
+                "pct = changesPercentage"
+              ],
+              "select": [],
+              "accept_if": [
+                "price is not None",
+                "changesPercentage is not None",
+                "volume > 0"
+              ]
+            },
+            {
+              "step": 2,
+              "extract": [
+                "articles = results[]",
+                "titles = results[][title]",
+                "descriptions = results[][description]"
+              ],
+              "compute": [
+                "headline = first(titles)",
+                "desc = first(descriptions)",
+                "matches_headline = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", headline)",
+                "matches_desc = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", desc)",
+                "matches = concat(matches_headline, matches_desc)",
+                "risk_summary = first(matches)"
+              ],
+              "select": [],
+              "accept_if": [
+                "len(articles) > 0",
+                "first(titles) is not None"
+              ]
+            }
+          ],
+          "final_answer_requirements": {
+            "format": "text",
+            "must_include": [
+              "current_price",
+              "one_day_pct_change",
+              "headline_risk"
+            ],
+            "grounded_from": [
+              "price",
+              "changesPercentage",
+              "volume",
+              "pct",
+              "articles",
+              "titles",
+              "descriptions",
+              "headline",
+              "desc",
+              "matches_headline",
+              "matches_desc",
+              "matches",
+              "risk_summary"
+            ],
+            "quality_criteria": [
+              "no hallucinations",
+              "concise"
+            ]
+          }
+        },
+        "final_reference": {
+          "answer_text": "Current Price: $258.02\nOne Day Percentage Change: 0.35%\nHeadline Risk: None",
+          "facts": {
+            "price": 258.02,
+            "changesPercentage": 0.34613,
+            "volume": 49155614,
+            "pct": 0.34613,
+            "articles": [],
+            "titles": [],
+            "descriptions": [],
+            "headline": null,
+            "desc": null,
+            "matches_headline": [],
+            "matches_desc": [],
+            "matches": [],
+            "risk_summary": null
+          },
+          "citations": {
+            "price": [
+              1
+            ],
+            "changesPercentage": [
+              1
+            ],
+            "volume": [
+              1
+            ],
+            "pct": [
+              1
+            ],
+            "articles": [
+              2
+            ],
+            "titles": [
+              2
+            ],
+            "descriptions": [
+              2
+            ],
+            "headline": [
+              2
+            ],
+            "desc": [
+              2
+            ],
+            "matches_headline": [
+              2
+            ],
+            "matches_desc": [
+              2
+            ],
+            "matches": [
+              2
+            ],
+            "risk_summary": [
+              2
+            ]
+          }
+        },
+        "judge_rubric": {
+          "weights": {
+            "coverage": 0.4,
+            "grounding": 0.3,
+            "clarity": 0.2,
+            "safety": 0.1
+          },
+          "target_length_range": [
+            15,
+            45
+          ],
+          "schema": {
+            "type": "object",
+            "properties": {
+              "coverage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "grounding": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "clarity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "safety": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "coverage",
+              "grounding",
+              "clarity",
+              "safety",
+              "total"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "extra_info": {
+      "task_metadata": {
+        "source_task": {
+          "task_id": "skyrl-001-aapl-snapshot",
+          "user_prompt": "Give me a two-sentence market snapshot for AAPL today: current price, 1-day % change, and one concise risk from the latest credible headline.",
+          "complexity": "simple",
+          "max_turns": 4,
+          "tools_available": [
+            "polygon: polygon_get_aggs, polygon_get_news",
+            "fmp: fmp_get_quote, fmp_get_income_statement, fmp_get_company_profile",
+            "tavily: tavily_search, tavily_extract",
+            "slack: send_slack_message, list_slack_channels",
+            "python_execution: execute_python, process_mcp_data"
+          ],
+          "limits": {
+            "max_tools": 5,
+            "max_servers": 5
+          },
+          "tool_sequence": [
+            {
+              "step": 1,
+              "server": "fmp",
+              "tool": "fmp_get_quote",
+              "params": {
+                "symbol": "AAPL"
+              },
+              "analysis_requirements": {
+                "extract": [
+                  "price",
+                  "changesPercentage",
+                  "volume"
+                ],
+                "compute": [
+                  "pct = changesPercentage"
+                ],
+                "select": [],
+                "accept_if": [
+                  "price is not None",
+                  "changesPercentage is not None",
+                  "volume > 0"
+                ]
+              }
+            },
+            {
+              "step": 2,
+              "server": "polygon",
+              "tool": "polygon_get_news",
+              "params": {
+                "ticker": "AAPL",
+                "limit": 3
+              },
+              "analysis_requirements": {
+                "extract": [
+                  "articles = results[]",
+                  "titles = results[][title]",
+                  "descriptions = results[][description]"
+                ],
+                "compute": [
+                  "headline = first(titles)",
+                  "desc = first(descriptions)",
+                  "matches_headline = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", headline)",
+                  "matches_desc = regex_extract_all(\"(?i)(lawsuit|regulat|antitrus|supply chain|recall|downgrade|layoff|supply|sales|earnings)\", desc)",
+                  "matches = concat(matches_headline, matches_desc)",
+                  "risk_summary = first(matches)"
+                ],
+                "select": [],
+                "accept_if": [
+                  "len(articles) > 0",
+                  "first(titles) is not None"
+                ]
+              }
+            }
+          ],
+          "final_answer_requirements": {
+            "format": "text",
+            "must_include": [
+              "current_price",
+              "one_day_pct_change",
+              "headline_risk"
+            ],
+            "grounded_from": [
+              "price",
+              "changesPercentage",
+              "volume",
+              "pct",
+              "articles",
+              "titles",
+              "descriptions",
+              "headline",
+              "desc",
+              "matches_headline",
+              "matches_desc",
+              "matches",
+              "risk_summary"
+            ],
+            "quality_criteria": [
+              "no hallucinations",
+              "concise"
+            ]
+          },
+          "judge_rubric": {
+            "weights": {
+              "coverage": 0.4,
+              "grounding": 0.3,
+              "clarity": 0.2,
+              "safety": 0.1
+            },
+            "target_length_range": [
+              15,
+              45
+            ],
+            "schema": {
+              "type": "object",
+              "properties": {
+                "coverage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "grounding": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "clarity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "safety": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "total": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "coverage",
+                "grounding",
+                "clarity",
+                "safety",
+                "total"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "domain": "equities-research",
+          "metadata": {
+            "prompt_id": "E01",
+            "original_complexity": "easy",
+            "prompt_index": 0
+          },
+          "_exec_out": {
+            "state_keys": [
+              "price",
+              "changesPercentage",
+              "volume",
+              "pct",
+              "articles",
+              "titles",
+              "descriptions",
+              "headline",
+              "desc",
+              "matches_headline",
+              "matches_desc",
+              "matches",
+              "risk_summary"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "tool_fqn": "fmp.fmp_get_quote",
+                "args": {
+                  "symbol": "AAPL"
+                },
+                "result_summary": {
+                  "ok": null,
+                  "keys": [
+                    "symbol",
+                    "name",
+                    "price",
+                    "changesPercentage",
+                    "change",
+                    "dayLow",
+                    "dayHigh",
+                    "yearHigh",
+                    "yearLow",
+                    "marketCap"
+                  ],
+                  "latency_ms": null
+                },
+                "accept_pass": true,
+                "checks": {
+                  "missing": [],
+                  "updated": [
+                    "price",
+                    "changesPercentage",
+                    "volume",
+                    "pct"
+                  ]
+                }
+              },
+              {
+                "step": 2,
+                "tool_fqn": "polygon.polygon_get_news",
+                "args": {
+                  "ticker": "AAPL",
+                  "limit": 3
+                },
+                "result_summary": {
+                  "ok": true,
+                  "keys": [
+                    "ok",
+                    "data",
+                    "latency_ms"
+                  ],
+                  "latency_ms": 158
+                },
+                "accept_pass": false,
+                "checks": {
+                  "missing": [],
+                  "updated": [
+                    "articles",
+                    "titles",
+                    "descriptions",
+                    "headline",
+                    "desc",
+                    "matches_headline",
+                    "matches_desc",
+                    "matches",
+                    "risk_summary"
+                  ]
+                }
+              }
+            ]
+          },
+          "_final_reference": {
+            "answer_text": "Current Price: $258.02\nOne Day Percentage Change: 0.35%\nHeadline Risk: None",
+            "facts": {
+              "price": 258.02,
+              "changesPercentage": 0.34613,
+              "volume": 49155614,
+              "pct": 0.34613,
+              "articles": [],
+              "titles": [],
+              "descriptions": [],
+              "headline": null,
+              "desc": null,
+              "matches_headline": [],
+              "matches_desc": [],
+              "matches": [],
+              "risk_summary": null
+            },
+            "citations": {
+              "price": [
+                1
+              ],
+              "changesPercentage": [
+                1
+              ],
+              "volume": [
+                1
+              ],
+              "pct": [
+                1
+              ],
+              "articles": [
+                2
+              ],
+              "titles": [
+                2
+              ],
+              "descriptions": [
+                2
+              ],
+              "headline": [
+                2
+              ],
+              "desc": [
+                2
+              ],
+              "matches_headline": [
+                2
+              ],
+              "matches_desc": [
+                2
+              ],
+              "matches": [
+                2
+              ],
+              "risk_summary": [
+                2
+              ]
+            }
+          },
+          "_model": "gpt-5-mini",
+          "_backend": "chat",
+          "_timestamp": "20251006T010211781997Z",
+          "_raw_output_path": "raw_llm/20251006T010211781997Z/task_0001.json"
+        },
+        "tools_available": [
+          "polygon: polygon_get_aggs, polygon_get_news",
+          "fmp: fmp_get_quote, fmp_get_income_statement, fmp_get_company_profile",
+          "tavily: tavily_search, tavily_extract",
+          "slack: send_slack_message, list_slack_channels",
+          "python_execution: execute_python, process_mcp_data",
+          "fmp_get_quote",
+          "polygon_get_news"
+        ],
+        "model": "gpt-5-mini",
+        "backend": "chat",
+        "generated_at": "20251006T010211781997Z",
+        "raw_output_path": "raw_llm/20251006T010211781997Z/task_0001.json",
+        "exec_breadcrumbs": {
+          "state_keys": [
+            "price",
+            "changesPercentage",
+            "volume",
+            "pct",
+            "articles",
+            "titles",
+            "descriptions",
+            "headline",
+            "desc",
+            "matches_headline",
+            "matches_desc",
+            "matches",
+            "risk_summary"
+          ],
+          "steps": [
+            {
+              "step": 1,
+              "tool_fqn": "fmp.fmp_get_quote",
+              "args": {
+                "symbol": "AAPL"
+              },
+              "result_summary": {
+                "ok": null,
+                "keys": [
+                  "symbol",
+                  "name",
+                  "price",
+                  "changesPercentage",
+                  "change",
+                  "dayLow",
+                  "dayHigh",
+                  "yearHigh",
+                  "yearLow",
+                  "marketCap"
+                ],
+                "latency_ms": null
+              },
+              "accept_pass": true,
+              "checks": {
+                "missing": [],
+                "updated": [
+                  "price",
+                  "changesPercentage",
+                  "volume",
+                  "pct"
+                ]
+              }
+            },
+            {
+              "step": 2,
+              "tool_fqn": "polygon.polygon_get_news",
+              "args": {
+                "ticker": "AAPL",
+                "limit": 3
+              },
+              "result_summary": {
+                "ok": true,
+                "keys": [
+                  "ok",
+                  "data",
+                  "latency_ms"
+                ],
+                "latency_ms": 158
+              },
+              "accept_pass": false,
+              "checks": {
+                "missing": [],
+                "updated": [
+                  "articles",
+                  "titles",
+                  "descriptions",
+                  "headline",
+                  "desc",
+                  "matches_headline",
+                  "matches_desc",
+                  "matches",
+                  "risk_summary"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,11 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 7002): address already in use
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 7005): address already in use
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 7003): address already in use
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 7004): address already in use
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 7001): address already in use

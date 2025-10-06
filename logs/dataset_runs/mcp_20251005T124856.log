@@ -1,0 +1,45 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 174, in execute_python
+    code = args["code"]
+           ~~~~^^^^^^^^
+KeyError: 'code'

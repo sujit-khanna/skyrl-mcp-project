@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CNUkT6MDP1JGnsJ0Z2tWHdUnDDYMI",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\n  \"task_id\": \"srch_equities_apple_001\",\n  \"user_prompt\": \"Find Apple\u2019s business description and give one sentence linking that to a current headline about the company.\",\n  \"complexity\": \"simple\",\n  \"max_turns\": 3,\n  \"tools_available\": [\n    \"polygon_get_aggs\",\n    \"polygon_get_news\",\n    \"fmp_get_quote\",\n    \"fmp_get_income_statement\",\n    \"fmp_get_company_profile\",\n    \"tavily_search\",\n    \"tavily_extract\",\n    \"send_slack_message\",\n    \"list_slack_channels\",\n    \"execute_python\",\n    \"process_mcp_data\"\n  ],\n  \"limits\": {\n    \"max_tools\": 5,\n    \"max_servers\": 3\n  },\n  \"tool_sequence\": [\n    {\n      \"step\": 1,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_company_profile\",\n      \"params\": {\n        \"symbol\": \"AAPL\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"description\",\n          \"industry\",\n          \"sector\"\n        ],\n        \"compute\": [],\n        \"select\": [],\n        \"accept_if\": [\n          \"description is not None\"\n        ]\n      }\n    },\n    {\n      \"step\": 2,\n      \"server\": \"polygon\",\n      \"tool\": \"polygon_get_news\",\n      \"params\": {\n        \"ticker\": \"AAPL\",\n        \"limit\": 5\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"articles = results[]\",\n          \"titles = results[][title]\",\n          \"urls = results[][url]\",\n          \"published_at = results[][published_utc]\"\n        ],\n        \"compute\": [\n          \"top_headline = first(titles)\",\n          \"top_url = first(urls)\",\n          \"top_time = first(published_at)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(articles) > 0\"\n        ]\n      }\n    }\n  ],\n  \"final_answer_requirements\": {\n    \"format\": \"text\",\n    \"must_include\": [\n      \"business_description\",\n      \"headline\"\n    ],\n    \"grounded_from\": [\n      \"description\",\n      \"top_headline\"\n    ],\n    \"quality_criteria\": [\n      \"no hallucinations\",\n      \"concise\"\n    ]\n  },\n  \"judge_rubric\": {\n    \"weights\": {\n      \"coverage\": 0.4,\n      \"grounding\": 0.4,\n      \"clarity\": 0.15,\n      \"safety\": 0.05\n    },\n    \"target_length_range\": [\n      15,\n      40\n    ]\n  }\n}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759715777,
+  "model": "gpt-5-mini-2025-08-07",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 1742,
+    "prompt_tokens": 1798,
+    "total_tokens": 3540,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 1152,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 1664
+    }
+  }
+}

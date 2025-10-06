@@ -1,0 +1,30 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+Python execution failure
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 146, in safe_execute
+    result = eval(code, env)  # noqa: S307 - restricted env
+             ^^^^^^^^^^^^^^^
+  File "<string>", line 1
+    inputs = {'price': '187.62', 'percent_move': '-0.67235', 'volume': '137596896', 'avg_volume': '172126535', 'articles': '[]'}
+           ^
+SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+NameError: name 'summarize_nvda' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 148, in safe_execute
+    exec(code, env)  # noqa: S102 - restricted env
+    ^^^^^^^^^^^^^^^
+  File "<string>", line 5, in <module>
+NameError: name 'type' is not defined

@@ -1,0 +1,140 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+Python execution failure
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 147, in safe_execute
+    result = eval(code, env)  # noqa: S307 - restricted env
+             ^^^^^^^^^^^^^^^
+  File "<string>", line 1
+    try:
+    ^^^
+SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 149, in safe_execute
+    exec(code, env)  # noqa: S102 - restricted env
+    ^^^^^^^^^^^^^^^
+  File "<string>", line 22
+SyntaxError: 'return' outside function
+Slack chat_postMessage failed
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/slack_server.py", line 68, in send_message
+    response = await client.chat_postMessage(channel=channel, text=message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/slack_sdk/web/async_client.py", line 2774, in chat_postMessage
+    return await self.api_call("chat.postMessage", json=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/slack_sdk/web/async_base_client.py", line 175, in api_call
+    return await self._send(
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/slack_sdk/web/async_base_client.py", line 215, in _send
+    return AsyncSlackResponse(**{**data, **res}).validate()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/slack_sdk/web/async_slack_response.py", line 203, in validate
+    raise e.SlackApiError(message=msg, response=self)
+slack_sdk.errors.SlackApiError: The request to the Slack API failed. (url: https://slack.com/api/chat.postMessage, status: 200)
+The server responded with: {'ok': False, 'error': 'channel_not_found'}
+Python execution failure
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 147, in safe_execute
+    result = eval(code, env)  # noqa: S307 - restricted env
+             ^^^^^^^^^^^^^^^
+  File "<string>", line 4
+    compute 10-day typical volume and compare to today's volume
+                                                      ^
+SyntaxError: unterminated string literal (detected at line 4)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 149, in safe_execute
+    exec(code, env)  # noqa: S102 - restricted env
+    ^^^^^^^^^^^^^^^
+  File "<string>", line 4
+    compute 10-day typical volume and compare to today's volume
+                                                      ^
+SyntaxError: unterminated string literal (detected at line 4)
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/tavily_server.py", line 75, in tavily_extract
+    url = args["url"]
+          ~~~~^^^^^^^
+KeyError: 'url'
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/tavily_server.py", line 75, in tavily_extract
+    url = args["url"]
+          ~~~~^^^^^^^
+KeyError: 'url'

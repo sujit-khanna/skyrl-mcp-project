@@ -1,0 +1,23 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+Tavily extract failed
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/tavily_server.py", line 80, in tavily_extract
+    extract_result = await asyncio.to_thread(client.extract, [url])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/tavily/tavily.py", line 231, in extract
+    response_dict = self._extract(urls,
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/.venv/lib/python3.12/site-packages/tavily/tavily.py", line 214, in _extract
+    raise BadRequestError(detail)
+tavily.errors.BadRequestError: All URLs failed validation.

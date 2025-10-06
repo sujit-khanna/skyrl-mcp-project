@@ -9,6 +9,7 @@ import random
 import re
 import time
 import uuid
+import statistics
 from copy import deepcopy
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -16,7 +17,11 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from openai import AsyncOpenAI
 
-from .common import SkyRLSample, to_skyrl_sample
+from .common import (
+    SkyRLSample,
+    load_curriculum_prompts,
+    to_skyrl_sample,
+)
 from src.utils.tool_manager import ToolManager  # REQUIRED - no fallback
 
 
@@ -173,9 +178,23 @@ def _compute(expr: str, state: dict) -> dict:
             return []
         return [key for key, _ in sorted(d.items(), key=lambda x: x[1], reverse=True)[:k]]
 
-    def head(lst: list, n: int):
-        """Return first n elements."""
-        return lst[:n] if isinstance(lst, list) else []
+    def head(lst: list, n: int = 1):
+        """Return first n elements (default 1)."""
+        if not isinstance(lst, list) or n <= 0:
+            return []
+        return lst[:n]
+
+    def first(lst: list):
+        """Return first element or None."""
+        if isinstance(lst, list) and lst:
+            return lst[0]
+        return None
+
+    def safe_index(lst: list, idx: int = 0):
+        """Safely index list, returning None if out-of-range."""
+        if isinstance(lst, list) and -len(lst) <= idx < len(lst):
+            return lst[idx]
+        return None
 
     def unique(lst: list):
         """Deduplicate preserving order."""
@@ -197,7 +216,16 @@ def _compute(expr: str, state: dict) -> dict:
 
     def regex_extract_all(pattern: str, text: str):
         """Extract all regex matches."""
-        return re.findall(pattern, text or "")
+        if not isinstance(pattern, str):
+            pattern, text = text, pattern
+        pattern = pattern or ""
+        text = text or ""
+        return re.findall(pattern, text)
+
+    def safe_attr(obj, attr: str):
+        if isinstance(obj, dict):
+            return obj.get(attr)
+        return getattr(obj, attr, None)
 
     # Build safe namespace
     safe_ns = {
@@ -209,15 +237,64 @@ def _compute(expr: str, state: dict) -> dict:
         "concat": concat,
         "count_keys": count_keys,
         "regex_extract_all": regex_extract_all,
+        "first": first,
+        "safe_index": safe_index,
+        "safe_attr": safe_attr,
+        "isinstance": isinstance,
+        "sum": sum,
+        "min": min,
+        "max": max,
+        "median": statistics.median,
+        "len": len,
+        "str": str,
+        "float": float,
+        "int": int,
+        "bool": bool,
     }
+
+    # Rewrite shorthand patterns like foo[][field] and foo[0].field
+    counter = 0
+
+    def replace_list_field(match):
+        nonlocal counter
+        counter += 1
+        var, field = match.groups()
+        temp = f"__item_{counter}"
+        return f"[{temp}.get('{field}') for {temp} in {var} if isinstance({temp}, dict)]"
+
+    rhs = re.sub(r"(\w+)\[\]\[(\w+)\]", replace_list_field, rhs)
+
+    def replace_index_attr(match):
+        var, idx, attr = match.groups()
+        return f"safe_attr(safe_index({var}, {idx}), '{attr}')"
+
+    rhs = re.sub(r"(\w+)\[(\d+)\]\.([A-Za-z_][A-Za-z0-9_]*)", replace_index_attr, rhs)
+
+    def replace_listcomp_attr(match):
+        item_var, attr, loop_var, collection = match.groups()
+        if item_var != loop_var:
+            return match.group(0)
+        return f"[safe_attr({loop_var}, '{attr}') for {loop_var} in {collection}]"
+
+    rhs = re.sub(r"\[([A-Za-z_][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*) for ([A-Za-z_][A-Za-z0-9_]*) in ([A-Za-z_][A-Za-z0-9_]*)\]", replace_listcomp_attr, rhs)
+
+    def replace_dot_attr(match):
+        var, attr = match.groups()
+        if var in safe_ns and isinstance(safe_ns[var], list):
+            return f"safe_attr(first({var}), '{attr}')"
+        if var in safe_ns and isinstance(safe_ns[var], dict):
+            return f"safe_attr({var}, '{attr}')"
+        return match.group(0)
+
+    rhs = re.sub(r"\b([A-Za-z_][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)\b", replace_dot_attr, rhs)
 
     # Evaluate RHS in controlled environment (no builtins)
     try:
         value = eval(rhs, {"__builtins__": {}}, safe_ns)
         return {name: value}
     except Exception as e:
-        logger.error(f"Compute expression '{expr}' failed: {e}")
-        raise
+        logger.warning(f"Compute expression '{expr}' failed: {e}; defaulting {name} to None")
+        return {name: None}
 
 
 def _check(cond: str, state: dict) -> bool:
@@ -304,6 +381,45 @@ def _ensure_api_key() -> None:
         raise RuntimeError("OPENAI_API_KEY is required to generate datasets")
 
 
+def _prepare_python_params(resolved_params: dict) -> dict:
+    """Convert planner-style params into the code payload expected by execute_python."""
+
+    params_copy = deepcopy(resolved_params)
+    script = params_copy.pop("code", None) or params_copy.pop("script", None)
+
+    prefix_lines = []
+    for key in list(params_copy.keys()):
+        value = params_copy.pop(key)
+        literal = repr(value)
+        prefix_lines.append(f"{key} = {literal}")
+
+    lines = prefix_lines
+    if script:
+        body_lines = script.splitlines() or ["pass"]
+        try_block = ["try:"]
+        for line in body_lines:
+            try_block.append("    " + (line if line else "pass"))
+        try_block.extend([
+            "except Exception as __exc:",
+            "    result = {'error': f\"{type(__exc).__name__}: {__exc}\"}",
+        ])
+        lines.extend(try_block)
+
+    code = "\n".join(lines) if lines else "pass"
+
+    return {"code": code}
+
+
+def _normalize_polygon_params(tool: str, params: dict) -> dict:
+    normalized = dict(params)
+    if tool == "polygon_get_aggs":
+        if "from" in normalized and "start_date" not in normalized:
+            normalized["start_date"] = normalized.pop("from")
+        if "to" in normalized and "end_date" not in normalized:
+            normalized["end_date"] = normalized.pop("to")
+    return normalized
+
+
 SYSTEM_PROMPT = (
     "You are an expert data generation assistant for SkyRL research agent training."
     " Create realistic long-horizon research tasks that require multi-tool planning with analysis at each step."
@@ -330,6 +446,12 @@ USER_TEMPLATE = (
     "\n"
     "2. Chain steps when needed: If a step's params use ${{variable_name}} syntax, ensure prior step extracted/computed that variable.\n"
     "   Not all steps need chaining - only use next_args_from when subsequent step actually references it.\n"
+    "\n"
+    "2a. Allowed helper functions for compute/select: head(list, n), first(list), safe_index(list, idx), safe_attr(obj, field), concat(*lists), unique(list), sum(list), min(list), max(list), median(list), regex_extract_all(pattern, text), count_keys(dict), pct_change_last_day(dict).\n"
+    "    - To pull nested values, alias them in extract (e.g., 'articles = results[]', 'titles = results[][title]').\n"
+    "    - Avoid raw Python idioms such as list[][field], foo[0].bar, custom helper names, or direct calls to str()/len()/sum()/median unless listed above.\n"
+    "    - Always guard indexing; use first()/safe_index() instead of assuming non-empty lists.\n"
+    "    - If data might be missing, let accept_if fail gracefully or skip downstream steps instead of forcing undefined variables.\n"
     "\n"
     "3. Final step should produce variables listed in final_answer_requirements.grounded_from.\n"
     "\n"
@@ -362,11 +484,15 @@ USER_TEMPLATE = (
     "- tavily_search(query): Returns 'results' array with search results\n"
     "  Example: extract: ['search_results = results[]'], accept_if: ['len(search_results) > 0']\n"
     "\n"
+    "Slack usage: only call send_slack_message if a prior step produced a non-empty message string.\n"
+    "Python execution: provide params['code'] with any input assignments followed by logic, and rely solely on the helpers listed above.\n"
     "CRITICAL: accept_if must ONLY reference variables from this step's extract/compute/select.\n"
     "WRONG: accept_if: ['len(result) > 0'] - 'result' is not a variable\n"
     "RIGHT: extract: ['price', 'volume'], accept_if: ['price is not None', 'volume > 0']\n"
     "\n"
-    "Use realistic parameters. Avoid placeholders like 'XXX' or 'TBD'."
+    "Use realistic parameters. Avoid placeholders like 'XXX' or 'TBD'. If a variable cannot be produced, drop the dependent step instead of inventing values."
+    "\n"
+    "Return valid JSON matching the schema."
 )
 
 
@@ -623,6 +749,29 @@ async def simulate_plan_and_collect(
         # Resolve placeholders: ${var} → state[var]
         params = _resolve_placeholders(params_template, state)
 
+        # Normalize python execution params after placeholder resolution
+        if step_obj.get("server") == "python_execution" and step_obj.get("tool") == "execute_python":
+            params = _prepare_python_params(params)
+        if step_obj.get("server") == "polygon" and step_obj.get("tool") == "polygon_get_aggs":
+            params = _normalize_polygon_params("polygon_get_aggs", params)
+
+        # Skip steps with unresolved placeholders to avoid tool errors
+        if any(isinstance(v, str) and "${" in v for v in params.values()):
+            logger.warning(
+                "Skipping step %s due to unresolved placeholders in params: %s",
+                step,
+                params,
+            )
+            exec_steps.append(ExecStep(
+                step=step,
+                tool_fqn=f'{step_obj["server"]}.{tool_name}',
+                args=params,
+                result_summary={"ok": False, "skipped": True},
+                accept_pass=False,
+                checks={"missing": [], "updated": []},
+            ))
+            continue
+
         logger.info("Step %d: Executing %s with params: %s", step, tool_name, json.dumps(params)[:100])
 
         # Execute tool via ToolManager
@@ -630,13 +779,29 @@ async def simulate_plan_and_collect(
             result = await tm.execute_tool(tool_name, params, timeout=30.0)
         except Exception as e:
             logger.error(f"Tool execution FAILED for {tool_name}: {e}")
-            raise RuntimeError(f"Tool execution failed for {tool_name}: {e}") from e
+            exec_steps.append(ExecStep(
+                step=step,
+                tool_fqn=f'{step_obj["server"]}.{tool_name}',
+                args=params,
+                result_summary={"ok": False, "error": str(e)},
+                accept_pass=False,
+                checks={"missing": [], "updated": []}
+            ))
+            continue
 
         # CRITICAL: Check if tool execution succeeded
         if not result.get("ok", False):
             error_msg = result.get("error", "Unknown error")
-            logger.error(f"Tool {tool_name} returned error: {error_msg}")
-            raise RuntimeError(f"Tool {tool_name} failed: {error_msg}")
+            logger.warning(f"Tool {tool_name} returned error: {error_msg}")
+            exec_steps.append(ExecStep(
+                step=step,
+                tool_fqn=f'{step_obj["server"]}.{tool_name}',
+                args=params,
+                result_summary={"ok": False, "error": error_msg},
+                accept_pass=False,
+                checks={"missing": [], "updated": []}
+            ))
+            continue
 
         # Unwrap data if wrapped in {"ok": true, "data": {...}}
         # After unwrapping, extraction paths should reference the inner structure
@@ -760,26 +925,34 @@ async def compose_reference_answer(
         "quality_criteria": far.get("quality_criteria", [])
     }
 
-    try:
-        resp = await client.chat.completions.create(
-            model=os.getenv("OPENAI_COMPOSER_MODEL", "gpt-4o-mini"),
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": json.dumps(user_content)}
-            ],
-            temperature=0.1,
-            max_tokens=512
-        )
+    async def _call_composer(prompt_payload: dict) -> Optional[dict]:
+        try:
+            resp_inner = await client.chat.completions.create(
+                model=os.getenv("OPENAI_COMPOSER_MODEL", "gpt-4o-mini"),
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": json.dumps(prompt_payload)}
+                ],
+                temperature=0.1,
+                max_tokens=512
+            )
+            return json.loads(resp_inner.choices[0].message.content)
+        except json.JSONDecodeError as exc:
+            logger.warning(f"Composer JSON decode failed: {exc}")
+            return None
+        except Exception as exc:
+            logger.error(f"LLM composition request failed: {exc}")
+            return None
 
-        data = json.loads(resp.choices[0].message.content)
+    data = await _call_composer(user_content)
+    answer_text = None
+    if data is not None:
         answer_text = data.get("answer") or data.get("final_answer")
-        if not answer_text:
-            logger.error("LLM composer returned empty answer")
-            raise RuntimeError("LLM composer failed to generate answer")
-    except Exception as e:
-        logger.error(f"LLM composition FAILED: {e}")
-        raise RuntimeError(f"Reference answer composition failed: {e}") from e
+    if not answer_text:
+        logger.warning("Using template-based fallback answer")
+        answer_text = _template_answer(facts, far)
+        data = None
 
     # Build citations: map each fact to last step that produced it
     name_to_step = {}
@@ -881,53 +1054,134 @@ async def _one_task(
     max_turns: int,
     backend: str,
     tm: ToolManager,
+    prompt_override: Optional[str] = None,
+    prompt_context: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     task_uuid = uuid.uuid4().hex[:10]
     task_id = f"{domain[:3]}-{task_uuid}"
-    user_prompt = USER_TEMPLATE.format(
+    planner_prompt = USER_TEMPLATE.format(
         domain=domain,
         complexity=complexity,
         inventory=_inventory_str(inventory),
         max_tools=max_tools,
         max_turns=max_turns,
     )
-
-    if backend == "responses":
-        logger.warning("Responses backend currently uses chat completions fallback for structured output.")
+    if prompt_override:
+        planner_prompt += (
+            "\nUSER TASK: "
+            + prompt_override.strip()
+            + "\nEnsure the generated plan sets user_prompt to this exact request."
+        )
 
     # Step 1: Get plan from LLM
     async def _invoke_chat():
+        if backend == "responses":
+            reasoning_effort = os.getenv("OPENAI_REASONING_EFFORT", "high")
+            return await client.responses.create(
+                model=model,
+                input=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": planner_prompt},
+                ],
+                reasoning={"effort": reasoning_effort},
+            )
+
         return await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
+                {"role": "user", "content": planner_prompt},
             ],
             response_format={"type": "json_schema", "json_schema": TASK_SCHEMA},
-            temperature=0.3,  # Lower temp for more structured output
         )
 
     resp = await _call_with_retry(_invoke_chat)
-    raw_payload = resp.model_dump()
-    choice = resp.choices[0]
-    content = choice.message.content
-    if isinstance(content, list):
-        collected: List[str] = []
-        for part in content:
-            if isinstance(part, dict):
-                text_value = part.get("text") or part.get("output_text")
-                if text_value:
-                    collected.append(text_value)
-            elif isinstance(part, str):
-                collected.append(part)
-        json_text = "".join(collected)
+    if hasattr(resp, "model_dump"):
+        raw_payload = resp.model_dump()
     else:
-        json_text = content or ""
+        try:
+            raw_payload = json.loads(resp.json())  # type: ignore[attr-defined]
+        except Exception:
+            raw_payload = {}
+
+    if backend == "responses":
+        json_text = getattr(resp, "output_text", None)
+        if not json_text:
+            collected: List[str] = []
+            for output in getattr(resp, "output", []) or []:
+                for part in getattr(output, "content", []) or []:
+                    text_value = getattr(part, "text", None) or getattr(part, "output_text", None)
+                    if text_value:
+                        collected.append(text_value)
+            json_text = "".join(collected)
+    else:
+        choice = resp.choices[0]
+        content = choice.message.content
+        if isinstance(content, list):
+            collected = []
+            for part in content:
+                if isinstance(part, dict):
+                    text_value = part.get("text") or part.get("output_text")
+                    if text_value:
+                        collected.append(text_value)
+                elif isinstance(part, str):
+                    collected.append(part)
+            json_text = "".join(collected)
+        else:
+            json_text = content or ""
+
+    if not json_text:
+        raise RuntimeError("Planner LLM returned empty content")
 
     task_dict = json.loads(json_text)
     task_dict.setdefault("task_id", task_id)
     task_dict.setdefault("tools_available", [f"{srv}:{tool}" for srv, tools in inventory.items() for tool in tools])
     task_dict.setdefault("limits", {"max_tools": max_tools, "max_turns": max_turns})
+    task_dict["complexity"] = complexity
+    task_dict.setdefault("domain", domain)
+    if prompt_override:
+        task_dict["user_prompt"] = prompt_override.strip()
+    if prompt_context:
+        task_dict.setdefault("metadata", {}).update(prompt_context)
+
+    # Normalize tool sequence naming conventions from planner output
+    if "tool_sequence" not in task_dict:
+        raw_steps = task_dict.get("tool_steps") or task_dict.get("toolSteps")
+        if raw_steps:
+            normalized_sequence: List[Dict[str, Any]] = []
+            for idx, raw_step in enumerate(raw_steps, start=1):
+                if not isinstance(raw_step, dict):
+                    continue
+                raw_tool = raw_step.get("tool") or raw_step.get("name")
+                if not raw_tool:
+                    continue
+                server = raw_step.get("server")
+                tool_name = raw_tool
+                if not server and "." in raw_tool:
+                    server, tool_name = raw_tool.split(".", 1)
+                if not server:
+                    for srv, tools in inventory.items():
+                        if tool_name in tools or raw_tool in tools:
+                            server = srv
+                            break
+                if not server:
+                    raise ValueError(f"Unable to infer server for tool '{raw_tool}'")
+
+                params = raw_step.get("params") or {}
+                analysis_requirements = raw_step.get("analysis_requirements") or raw_step.get("analysisRequirements") or {}
+                normalized_sequence.append({
+                    "step": idx,
+                    "server": server,
+                    "tool": tool_name,
+                    "params": params,
+                    "analysis_requirements": analysis_requirements,
+                })
+
+            if normalized_sequence:
+                task_dict["tool_sequence"] = normalized_sequence
+
+    if "tool_sequence" not in task_dict:
+        raise ValueError("Planner output missing 'tool_sequence'")
 
     # Step 2: Verify and repair plan
     task_dict = _verify_and_repair(task_dict)
@@ -986,7 +1240,7 @@ async def generate_dataset(
     out_path: str,
     n: int = 50,
     model: str = "gpt-5-mini",
-    backend: str = "responses",
+    backend: str = "chat",
     domains: Optional[List[str]] = None,
     complexities: Sequence[str] = ("simple", "moderate", "complex"),
     inventory: Optional[Dict[str, List[str]]] = None,
@@ -995,6 +1249,8 @@ async def generate_dataset(
     env_class: str = "MCPToolEnv",
     data_source: str = "synthetic/llm",
     mcp_config_dir: str = "mcp_servers/configs",
+    prompt_file: Optional[str] = None,
+    shuffle_prompts: bool = False,
 ) -> int:
     _ensure_api_key()
     client = AsyncOpenAI()
@@ -1018,15 +1274,46 @@ async def generate_dataset(
     raw_dir = out_path_obj.parent / "raw_llm" / timestamp
     raw_dir.mkdir(parents=True, exist_ok=True)
 
+    prompts: Optional[List[Dict[str, Any]]] = None
+    if prompt_file:
+        prompts = load_curriculum_prompts(prompt_file)
+        if not prompts:
+            raise ValueError(f"No prompts loaded from {prompt_file}")
+        if shuffle_prompts:
+            random.shuffle(prompts)
+        n = len(prompts)
+
     random.seed(time.time())
 
     samples: List[SkyRLSample] = []
 
     try:
         for index in range(n):
-            complexity = complexities[index % len(complexities)]
-            domain = domains[index % len(domains)]
-            logger.info("Generating task %d/%d (domain=%s, complexity=%s)", index + 1, n, domain, complexity)
+            if prompts:
+                prompt_entry = prompts[index]
+                complexity = prompt_entry["complexity"]
+                domain = prompt_entry["metadata"].get("domain") if isinstance(prompt_entry.get("metadata"), dict) else None
+                if not domain:
+                    domain = domains[0] if domains else "equities-research"
+                prompt_metadata = {
+                    "prompt_id": prompt_entry.get("prompt_id"),
+                    **(prompt_entry.get("metadata") or {}),
+                    "prompt_index": index,
+                }
+                user_prompt_override = prompt_entry["user_prompt"]
+            else:
+                complexity = complexities[index % len(complexities)]
+                domain = domains[index % len(domains)]
+                prompt_metadata = {"prompt_index": index}
+                user_prompt_override = None
+
+            logger.info(
+                "Generating task %d/%d (domain=%s, complexity=%s)",
+                index + 1,
+                n,
+                domain,
+                complexity,
+            )
 
             task_dict, raw_payload = await _one_task(
                 client=client,
@@ -1038,6 +1325,8 @@ async def generate_dataset(
                 max_turns=max_turns,
                 backend=backend,
                 tm=tm,
+                prompt_override=user_prompt_override,
+                prompt_context=prompt_metadata,
             )
 
             raw_file = raw_dir / f"task_{index+1:04d}.json"
@@ -1081,6 +1370,8 @@ if __name__ == "__main__":
     parser.add_argument("--mcp-config-dir", type=str, default="mcp_servers/configs", help="Path to MCP tool configs")
     parser.add_argument("--domains", type=str, nargs="*", help="Override domain list")
     parser.add_argument("--complexities", type=str, nargs="*", help="Override complexity sequence")
+    parser.add_argument("--prompt-file", type=str, help="Path to curriculum prompt file")
+    parser.add_argument("--shuffle-prompts", action="store_true", help="Shuffle prompts before generation")
 
     args = parser.parse_args()
 
@@ -1097,6 +1388,8 @@ if __name__ == "__main__":
             env_class=args.env_class,
             data_source=args.data_source,
             mcp_config_dir=args.mcp_config_dir,
+            prompt_file=args.prompt_file,
+            shuffle_prompts=args.shuffle_prompts,
         )
     )
     print(f"✅ Generated {count} samples → {args.out}")

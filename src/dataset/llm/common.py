@@ -1,5 +1,7 @@
 from __future__ import annotations
+import json
 from dataclasses import dataclass, asdict
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence
 
 PromptMessage = Dict[str, str]
@@ -211,3 +213,56 @@ def to_skyrl_sample(task: Dict[str, Any], env_class: str, data_source: str) -> S
         reward_spec=reward_spec,
         extra_info=metadata,
     )
+CURRICULUM_COMPLEXITY_MAP = {
+    "easy": "simple",
+    "medium": "moderate",
+    "difficult": "complex",
+}
+
+
+def normalize_complexity(label: str) -> str:
+    """Map arbitrary curriculum labels onto generator complexity buckets."""
+
+    if not label:
+        raise ValueError("Complexity label must be non-empty")
+
+    cleaned = label.strip().lower()
+    if cleaned in CURRICULUM_COMPLEXITY_MAP:
+        return CURRICULUM_COMPLEXITY_MAP[cleaned]
+    if cleaned in {"simple", "moderate", "complex"}:
+        return cleaned
+    raise ValueError(f"Unsupported complexity label: {label}")
+
+
+def load_curriculum_prompts(path: str | Path) -> List[Dict[str, Any]]:
+    """Read a JSON array of prompts and normalize their complexity values."""
+
+    prompt_path = Path(path)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+
+    raw = json.loads(prompt_path.read_text())
+    if not isinstance(raw, list):
+        raise ValueError("Curriculum prompt file must contain a JSON array")
+
+    normalized: List[Dict[str, Any]] = []
+    for idx, item in enumerate(raw):
+        if not isinstance(item, dict):
+            raise ValueError(f"Prompt entry {idx} is not an object")
+        user_prompt = (item.get("user_prompt") or "").strip()
+        if not user_prompt:
+            raise ValueError(f"Prompt entry {idx} missing 'user_prompt'")
+        complexity_raw = item.get("complexity")
+        complexity = normalize_complexity(complexity_raw) if complexity_raw else "moderate"
+        metadata = {k: v for k, v in item.items() if k not in {"user_prompt", "complexity", "id", "prompt_id"}}
+        if complexity_raw is not None:
+            metadata.setdefault("original_complexity", complexity_raw)
+
+        normalized.append({
+            "user_prompt": user_prompt,
+            "complexity": complexity,
+            "prompt_id": item.get("id") or item.get("prompt_id"),
+            "metadata": metadata,
+        })
+
+    return normalized

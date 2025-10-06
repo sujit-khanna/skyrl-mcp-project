@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CNTNbx6QU48NWyJBA7UpyGodoBAfL",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\n  \"task_id\": \"equities_top_mover_today_001\",\n  \"user_prompt\": \"Between AAPL, MSFT, and NVDA, which had the largest % move today? Provide the ranking, one plausible driver headline for the top mover, and a 2-sentence explanation.\",\n  \"complexity\": \"moderate\",\n  \"max_turns\": 8,\n  \"tools_available\": [\n    \"polygon_get_aggs\",\n    \"polygon_get_news\",\n    \"fmp_get_quote\",\n    \"fmp_get_income_statement\",\n    \"fmp_get_company_profile\",\n    \"tavily_search\",\n    \"tavily_extract\",\n    \"send_slack_message\",\n    \"list_slack_channels\",\n    \"execute_python\",\n    \"process_mcp_data\"\n  ],\n  \"limits\": {\n    \"max_tools\": 5,\n    \"max_servers\": 5\n  },\n  \"tool_sequence\": [\n    {\n      \"step\": 1,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"AAPL\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\",\n          \"volume\",\n          \"symbol\"\n        ],\n        \"compute\": [\n          \"pct = changesPercentage\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\",\n          \"volume > 0\"\n        ],\n        \"next_args_from\": \"quote_AAPL\"\n      }\n    },\n    {\n      \"step\": 2,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"MSFT\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\",\n          \"volume\",\n          \"symbol\"\n        ],\n        \"compute\": [\n          \"pct = changesPercentage\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\",\n          \"volume > 0\"\n        ],\n        \"next_args_from\": \"quote_MSFT\"\n      }\n    },\n    {\n      \"step\": 3,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"NVDA\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\",\n          \"volume\",\n          \"symbol\"\n        ],\n        \"compute\": [\n          \"pct = changesPercentage\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\",\n          \"volume > 0\"\n        ],\n        \"next_args_from\": \"quote_NVDA\"\n      }\n    },\n    {\n      \"step\": 4,\n      \"server\": \"python_execution\",\n      \"tool\": \"execute_python\",\n      \"params\": {\n        \"function\": \"compute_ranking\",\n        \"args\": {\n          \"quotes\": \"${quote_AAPL},${quote_MSFT},${quote_NVDA}\"\n        },\n        \"notes\": \"Compute ranking of the three symbols by absolute daily percent change (use changesPercentage fields). Return a list of dicts sorted desc by abs(pct): [{'symbol':..., 'pct':...}, ...], plus top_symbol and top_pct.\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"ranking\",\n          \"top_symbol\",\n          \"top_pct\"\n        ],\n        \"compute\": [\n          \"top_three = head(ranking, 3)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(ranking) == 3\",\n          \"top_symbol in ['AAPL','MSFT','NVDA']\",\n          \"top_pct is not None\"\n        ],\n        \"next_args_from\": \"top_symbol\"\n      }\n    },\n    {\n      \"step\": 5,\n      \"server\": \"polygon\",\n      \"tool\": \"polygon_get_news\",\n      \"params\": {\n        \"ticker\": \"${top_symbol}\",\n        \"limit\": 5,\n        \"timespan_hint\": \"today\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"articles = results[]\"\n        ],\n        \"compute\": [\n          \"top_article = head(articles, 1)\",\n          \"headline = top_article[0].title if len(top_article) > 0 else None\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(articles) > 0\",\n          \"headline is not None\"\n        ]\n      }\n    }\n  ],\n  \"final_answer_requirements\": {\n    \"must_include\": [\n      \"ranking\",\n      \"top_mover_headline\",\n      \"2-sentence_explanation\"\n    ],\n    \"grounded_from\": [\n      \"ranking\",\n      \"top_symbol\",\n      \"top_pct\",\n      \"headline\"\n    ],\n    \"quality_criteria\": [\n      \"no hallucinations\",\n      \"concise\",\n      \"format: text\"\n    ]\n  },\n  \"judge_rubric\": {\n    \"weights\": {\n      \"coverage\": 0.4,\n      \"grounding\": 0.3,\n      \"clarity\": 0.2,\n      \"safety\": 0.1\n    },\n    \"target_length_range\": [\n      40,\n      120\n    ]\n  }\n}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759710515,
+  "model": "gpt-5-mini-2025-08-07",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 4812,
+    "prompt_tokens": 1575,
+    "total_tokens": 6387,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 3648,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  }
+}

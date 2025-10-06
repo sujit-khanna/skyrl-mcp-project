@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-CNTJw6C24p9FEUnp2t155veeBfTLG",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\n  \"task_id\": \"msft-news-price-001\",\n  \"user_prompt\": \"Pull two latest credible headlines for MSFT and explain in one sentence how they might relate to today\u2019s price move.\",\n  \"complexity\": \"simple\",\n  \"max_turns\": 4,\n  \"tools_available\": [\n    \"polygon: polygon_get_aggs, polygon_get_news\",\n    \"fmp: fmp_get_quote, fmp_get_income_statement, fmp_get_company_profile\",\n    \"tavily: tavily_search, tavily_extract\",\n    \"slack: send_slack_message, list_slack_channels\",\n    \"python_execution: execute_python, process_mcp_data\"\n  ],\n  \"limits\": {\n    \"max_tools\": 5,\n    \"max_servers\": 8\n  },\n  \"tool_sequence\": [\n    {\n      \"step\": 1,\n      \"server\": \"polygon\",\n      \"tool\": \"polygon_get_news\",\n      \"params\": {\n        \"ticker\": \"MSFT\",\n        \"limit\": 5\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"articles = results[]\"\n        ],\n        \"compute\": [\n          \"top2 = head(articles, 2)\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"len(articles) > 1\"\n        ]\n      }\n    },\n    {\n      \"step\": 2,\n      \"server\": \"fmp\",\n      \"tool\": \"fmp_get_quote\",\n      \"params\": {\n        \"symbol\": \"MSFT\"\n      },\n      \"analysis_requirements\": {\n        \"extract\": [\n          \"price\",\n          \"changesPercentage\",\n          \"volume\"\n        ],\n        \"compute\": [\n          \"price_change_pct = changesPercentage\"\n        ],\n        \"select\": [],\n        \"accept_if\": [\n          \"price is not None\",\n          \"changesPercentage is not None\"\n        ]\n      }\n    }\n  ],\n  \"final_answer_requirements\": {\n    \"must_include\": [\n      \"headline_1\",\n      \"headline_2\",\n      \"price_change_pct\"\n    ],\n    \"grounded_from\": [\n      \"top2\",\n      \"price\",\n      \"changesPercentage\"\n    ],\n    \"quality_criteria\": [\n      \"no hallucinations\",\n      \"concise (one sentence relating headlines to price move)\",\n      \"format: text\"\n    ]\n  },\n  \"judge_rubric\": {\n    \"weights\": {\n      \"coverage\": 0.25,\n      \"grounding\": 0.45,\n      \"clarity\": 0.25,\n      \"safety\": 0.05\n    },\n    \"target_length_range\": [\n      20,\n      50\n    ]\n  }\n}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1759710288,
+  "model": "gpt-5-mini-2025-08-07",
+  "object": "chat.completion",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 2892,
+    "prompt_tokens": 1558,
+    "total_tokens": 4450,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 2304,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  }
+}

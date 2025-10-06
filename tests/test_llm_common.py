@@ -1,6 +1,13 @@
 import pytest
 
-from src.dataset.llm.common import to_skyrl_sample
+import json
+from pathlib import Path
+
+from src.dataset.llm.common import (
+    load_curriculum_prompts,
+    normalize_complexity,
+    to_skyrl_sample,
+)
 
 
 def _sample_task():
@@ -54,8 +61,8 @@ def test_to_skyrl_sample_builds_reward_spec_with_rubric():
     reward = sample.reward_spec
     assert reward["method"] == "rule"
     assert reward["ground_truth"]["tool_sequence"][0]["server"] == "polygon"
-    assert reward["ground_truth"]["success"]["must_call_tool"] == "polygon_get_aggs"
-    assert reward["evaluation"]["rubric"]["criteria"][0]["name"] == "Insight"
+    assert reward["ground_truth"]["success"]["must_call_tool"] == "polygon.polygon_get_aggs"
+    assert reward["ground_truth"]["analysis_rubric"]["steps"][0]["step"] == 1
 
 
 def test_to_skyrl_sample_requires_user_prompt():
@@ -63,6 +70,32 @@ def test_to_skyrl_sample_requires_user_prompt():
     task.pop("user_prompt")
     with pytest.raises(ValueError):
         to_skyrl_sample(task, env_class="MCPToolEnv", data_source="synthetic/llm")
+
+
+def test_normalize_complexity_maps_curriculum_labels():
+    assert normalize_complexity("easy") == "simple"
+    assert normalize_complexity("medium") == "moderate"
+    assert normalize_complexity("difficult") == "complex"
+    assert normalize_complexity("Complex") == "complex"
+    with pytest.raises(ValueError):
+        normalize_complexity("unknown")
+
+
+def test_load_curriculum_prompts(tmp_path: Path):
+    data = [
+        {"id": "E01", "user_prompt": "Hello", "complexity": "easy", "extra": 1},
+        {"user_prompt": "World", "complexity": "complex"},
+    ]
+    prompt_file = tmp_path / "prompts.json"
+    prompt_file.write_text(json.dumps(data))
+
+    prompts = load_curriculum_prompts(prompt_file)
+    assert len(prompts) == 2
+    assert prompts[0]["complexity"] == "simple"
+    assert prompts[0]["prompt_id"] == "E01"
+    assert prompts[0]["metadata"]["extra"] == 1
+    assert prompts[0]["metadata"]["original_complexity"] == "easy"
+    assert prompts[1]["complexity"] == "complex"
 
 
 def test_to_skyrl_sample_requires_tool_sequence():

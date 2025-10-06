@@ -1,0 +1,24 @@
+Starting polygon on port 7001
+Starting fmp on port 7002
+Starting tavily on port 7003
+Starting python on port 7004
+Starting slack on port 7005
+All MCP servers started. Press Ctrl+C to stop.
+Python execution failure
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 144, in safe_execute
+    result = eval(code, env)  # noqa: S307 - restricted env
+             ^^^^^^^^^^^^^^^
+  File "<string>", line 1
+    inputs = {'price': '258.02', 'changes_pct': '0.34613', 'latest': '[]'}
+           ^
+SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sujitkhanna/Desktop/ongoing_projects/rl_projects/skyrl-mcp-project/src/mcp_tools/python_execution_server.py", line 146, in safe_execute
+    exec(code, env)  # noqa: S102 - restricted env
+    ^^^^^^^^^^^^^^^
+  File "<string>", line 2, in <module>
+NameError: name 'build_snapshot' is not defined

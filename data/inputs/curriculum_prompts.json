@@ -1,0 +1,212 @@
+[
+  {
+    "id": "E01",
+    "complexity": "easy",
+    "user_prompt": "Give me a two-sentence market snapshot for AAPL today: current price, 1-day % change, and one concise risk from the latest credible headline.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python", "slack"],
+    "why_multi_turn": "Fetch live quote → fetch/scan 1–2 headlines → extract 1 risk → compose grounded text."
+  },
+  {
+    "id": "E02",
+    "complexity": "easy",
+    "user_prompt": "Summarize NVDA today in three bullets: price & % move, trading volume context (high/low vs typical), and one headline that might explain the move.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Quote → simple volume context calc → news scan → synthesis."
+  },
+  {
+    "id": "E03",
+    "complexity": "easy",
+    "user_prompt": "Is the US equity market currently open? If closed, report the next open time; if open, report one high-impact NVDA headline from a credible source.",
+    "likely_tools": ["polygon.market_status", "polygon.news", "tavily.search"],
+    "why_multi_turn": "Status check → conditional news retrieval → filter credible source."
+  },
+  {
+    "id": "E04",
+    "complexity": "easy",
+    "user_prompt": "What does AMD do, and what is its current price and 1-day change? Answer in ≤120 words with one short citation to a source.",
+    "likely_tools": ["fmp.profile", "fmp.quote", "tavily.search"],
+    "why_multi_turn": "Profile + quote → brief overview → cite."
+  },
+  {
+    "id": "E05",
+    "complexity": "easy",
+    "user_prompt": "Pull two latest credible headlines for MSFT and explain in one sentence how they might relate to today’s price move.",
+    "likely_tools": ["polygon.news", "tavily.search", "fmp.quote"],
+    "why_multi_turn": "News → credibility check → price context → explanation."
+  },
+  {
+    "id": "E06",
+    "complexity": "easy",
+    "user_prompt": "Provide a concise 3-bullet update for TSLA: price, % change, and one opportunity and one risk inferred from today’s headlines.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Quote → news parsing → classify into opportunity/risk."
+  },
+  {
+    "id": "E07",
+    "complexity": "easy",
+    "user_prompt": "Report the 1-day move for SPY and cite a single headline that plausibly explains it. Keep it under 80 words.",
+    "likely_tools": ["fmp.quote", "polygon.news", "tavily.search"],
+    "why_multi_turn": "Quote → headline selection → concise synthesis."
+  },
+  {
+    "id": "E08",
+    "complexity": "easy",
+    "user_prompt": "Find Apple’s business description and give one sentence linking that to a current headline about the company.",
+    "likely_tools": ["fmp.profile", "polygon.news"],
+    "why_multi_turn": "Profile → headline retrieval → linkage."
+  },
+  {
+    "id": "E09",
+    "complexity": "easy",
+    "user_prompt": "For META, produce a short note with current price, % move, and a single plausible driver from reputable coverage.",
+    "likely_tools": ["fmp.quote", "tavily.search", "polygon.news"],
+    "why_multi_turn": "Quote → search or news → driver selection."
+  },
+  {
+    "id": "E10",
+    "complexity": "easy",
+    "user_prompt": "Send me (in Slack) a one-liner on NFLX with price, % move, and a link to one credible article explaining the move.",
+    "likely_tools": ["fmp.quote", "polygon.news", "slack.post"],
+    "why_multi_turn": "Quote → pick 1 article → Slack delivery."
+  },
+  {
+    "id": "M11",
+    "complexity": "medium",
+    "user_prompt": "Between AAPL, MSFT, and NVDA, which had the largest % move today? Provide the ranking, one plausible driver headline for the top mover, and a 2-sentence explanation.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Fetch 3 quotes → compute ranking → gather headlined driver → reasoned write-up."
+  },
+  {
+    "id": "M12",
+    "complexity": "medium",
+    "user_prompt": "Build a mini brief for AVGO: price & % move, one positive and one negative headline summary (each ≤20 words), and a final 1-sentence risk note.",
+    "likely_tools": ["fmp.quote", "polygon.news", "tavily.search", "python"],
+    "why_multi_turn": "Quote → news triage → polarity tagging → concise synthesis."
+  },
+  {
+    "id": "M13",
+    "complexity": "medium",
+    "user_prompt": "Check if today’s TSLA volume looks unusually high vs typical recent days. If yes, provide two headlines that might explain it and a 2-sentence hypothesis.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Fetch volume & heuristic baseline → conditional news → causal hypothesis."
+  },
+  {
+    "id": "M14",
+    "complexity": "medium",
+    "user_prompt": "Fact-check the claim “Apple announced a new product this week.” Verify with at least two independent sources and state your verdict with citations.",
+    "likely_tools": ["tavily.search", "polygon.news"],
+    "why_multi_turn": "Search multiple sources → cross-verification → grounded verdict."
+  },
+  {
+    "id": "M15",
+    "complexity": "medium",
+    "user_prompt": "Create a concise competitor context for AMD by contrasting one AMD headline with one NVDA headline, then state how this might influence investor sentiment today.",
+    "likely_tools": ["polygon.news", "tavily.search", "fmp.quote"],
+    "why_multi_turn": "Dual news retrieval → compare → sentiment reasoning."
+  },
+  {
+    "id": "M16",
+    "complexity": "medium",
+    "user_prompt": "Give a 4-bullet brief for SMCI today: price & % change, headline-driven catalyst, operational risk from credible coverage, and your one-sentence takeaway.",
+    "likely_tools": ["fmp.quote", "polygon.news", "tavily.search"],
+    "why_multi_turn": "Quote → catalyzing headline → risk headline → synthesis."
+  },
+  {
+    "id": "M17",
+    "complexity": "medium",
+    "user_prompt": "Identify one stock among MSFT, GOOGL, META whose headlines suggest a regulatory risk today. Provide price context and ≤2 sentences explaining the risk.",
+    "likely_tools": ["polygon.news", "tavily.search", "fmp.quote"],
+    "why_multi_turn": "Scan news for regulatory cues → pick candidate → add price context → explain."
+  },
+  {
+    "id": "M18",
+    "complexity": "medium",
+    "user_prompt": "Find one credible bearish article on NVDA today and contrast it with one neutral/positive piece. Summarize implications for near-term price action (≤120 words).",
+    "likely_tools": ["tavily.search", "polygon.news"],
+    "why_multi_turn": "Gather opposing views → balanced synthesis."
+  },
+  {
+    "id": "M19",
+    "complexity": "medium",
+    "user_prompt": "Produce a compact watchlist digest for AAPL, MSFT, NVDA: price, % move, and one plausible driver headline each. End with a 2-sentence overview.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Batch quotes → per-name headline → overview."
+  },
+  {
+    "id": "M20",
+    "complexity": "medium",
+    "user_prompt": "For GOOGL, extract a single operational theme from today’s headlines (e.g., AI, ads, cloud) and explain how it might affect near-term sentiment.",
+    "likely_tools": ["polygon.news", "tavily.search", "python"],
+    "why_multi_turn": "Headline clustering/classification → one-theme synthesis."
+  },
+  {
+    "id": "D21",
+    "complexity": "difficult",
+    "user_prompt": "Create a one-page investor brief for NVDA combining: price/% move, concise company context, three diverse headlines (with sources), and a balanced risk-vs-opportunity summary.",
+    "likely_tools": ["fmp.quote", "fmp.profile", "polygon.news", "tavily.search", "python", "slack.post"],
+    "why_multi_turn": "Multiple retrievals → dedup/credibility filter → structured synthesis → optional Slack delivery."
+  },
+  {
+    "id": "D22",
+    "complexity": "difficult",
+    "user_prompt": "Evaluate whether today’s AAPL move is more likely news-driven or market-beta driven. Use credible AAPL headlines and a SPY context check; argue your conclusion.",
+    "likely_tools": ["fmp.quote", "polygon.news", "tavily.search"],
+    "why_multi_turn": "Quotes for AAPL & SPY → news inspection → causal attribution."
+  },
+  {
+    "id": "D23",
+    "complexity": "difficult",
+    "user_prompt": "Build a concise narrative for MSFT by triangulating: price/% move, 2 credible headlines from distinct outlets, and one strategic implication for the next week.",
+    "likely_tools": ["fmp.quote", "tavily.search", "polygon.news", "python"],
+    "why_multi_turn": "Cross-source verification → synthesis → forward implication."
+  },
+  {
+    "id": "D24",
+    "complexity": "difficult",
+    "user_prompt": "Compare sentiment across AMD, NVDA, and AVGO using today’s headline sets, pick the most negative, and write a grounded 3-paragraph analysis with citations.",
+    "likely_tools": ["polygon.news", "tavily.search", "fmp.quote", "python"],
+    "why_multi_turn": "Multi-name news retrieval → heuristic sentiment → reasoned write-up with cites."
+  },
+  {
+    "id": "D25",
+    "complexity": "difficult",
+    "user_prompt": "Investigate whether SMCI’s story today is supply-chain, demand, or execution related. Provide two sourced snippets and a final stance grounded in those snippets.",
+    "likely_tools": ["tavily.search", "polygon.news", "python"],
+    "why_multi_turn": "Evidence gathering → categorize → stance."
+  },
+  {
+    "id": "D26",
+    "complexity": "difficult",
+    "user_prompt": "Assemble a research digest for the AI-platform theme using AAPL, MSFT, and GOOGL: price/% move each, one headline per name, and a cross-name takeaway.",
+    "likely_tools": ["fmp.quote", "polygon.news", "tavily.search", "python"],
+    "why_multi_turn": "Parallel retrievals → normalization → synthesis."
+  },
+  {
+    "id": "D27",
+    "complexity": "difficult",
+    "user_prompt": "Draft a brief for a PM: Why did META move today? Include price/% move, two corroborating headlines from different outlets, and a risk/mitigation bullet.",
+    "likely_tools": ["fmp.quote", "tavily.search", "polygon.news"],
+    "why_multi_turn": "Quote → multi-source corroboration → risk framing."
+  },
+  {
+    "id": "D28",
+    "complexity": "difficult",
+    "user_prompt": "Produce a cross-ticker news-flow map for NVDA and AMD (top 3 headlines each), highlight overlap or divergence of topics, and provide a conclusion.",
+    "likely_tools": ["polygon.news", "tavily.search", "python"],
+    "why_multi_turn": "Collect & cluster topics → compare/contrast → conclusion."
+  },
+  {
+    "id": "D29",
+    "complexity": "difficult",
+    "user_prompt": "Construct an end-of-day wrap for TSLA: price/% move, any unusual volume note, three headline-backed drivers (bull, bear, neutral), and a balanced summary.",
+    "likely_tools": ["fmp.quote", "polygon.news", "python"],
+    "why_multi_turn": "Quote/volume context → triaged drivers → balanced wrap."
+  },
+  {
+    "id": "D30",
+    "complexity": "difficult",
+    "user_prompt": "Create a long-form (≈200–300 words) grounded analysis for AVGO integrating price context, multi-source headlines, and your judgment on near-term risk/reward; include inline citations.",
+    "likely_tools": ["fmp.quote", "tavily.search", "polygon.news", "python", "slack.post"],
+    "why_multi_turn": "Quote → cross-source retrieval → reasoned long-form → optional Slack send."
+  }
+]
