@@ -37,6 +37,13 @@ def get_client() -> PolygonClient:
     return _client
 
 
+def _require_ticker(args: Dict[str, Any]) -> str:
+    ticker = args.get("ticker") or args.get("symbol")
+    if not ticker:
+        raise ValueError("Request must include 'ticker' or 'symbol'")
+    return str(ticker).upper()
+
+
 def _fetch_price_data(
     ticker: str,
     start_date: str,
@@ -149,7 +156,10 @@ def _fetch_previous_close(ticker: str) -> Dict[str, Any]:
 async def polygon_get_aggs(request: Request) -> Response:
     payload = await request.json()
     args = payload.get("arguments", {})
-    ticker = args["ticker"]
+    try:
+        ticker = _require_ticker(args)
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
     start_date = args["start_date"]
     end_date = args["end_date"]
     frequency = args.get("frequency", "daily")
@@ -201,7 +211,10 @@ async def polygon_get_aggs(request: Request) -> Response:
 async def polygon_get_news(request: Request) -> Response:
     payload = await request.json()
     args = payload.get("arguments", {})
-    ticker = args["ticker"]
+    try:
+        ticker = _require_ticker(args)
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
     limit = int(args.get("limit", 5))
 
     start = asyncio.get_running_loop().time()
@@ -225,7 +238,10 @@ async def polygon_get_news(request: Request) -> Response:
 async def polygon_get_ticker_details(request: Request) -> Response:
     payload = await request.json()
     args = payload.get("arguments", {})
-    ticker = args["ticker"]
+    try:
+        ticker = _require_ticker(args)
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
 
     start = asyncio.get_running_loop().time()
     data = await asyncio.to_thread(_fetch_ticker_details, ticker)
@@ -244,7 +260,10 @@ async def polygon_get_market_status(request: Request) -> Response:
 async def polygon_get_previous_close(request: Request) -> Response:
     payload = await request.json()
     args = payload.get("arguments", {})
-    ticker = args["ticker"]
+    try:
+        ticker = _require_ticker(args)
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
 
     start = asyncio.get_running_loop().time()
     data = await asyncio.to_thread(_fetch_previous_close, ticker)

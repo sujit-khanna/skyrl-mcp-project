@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import signal
 import subprocess
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 if str(ROOT := Path(__file__).resolve().parents[1]) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -103,12 +105,14 @@ def to_openai_messages(observation):
     return messages
 
 
-def run_episode(client: OpenAI, env: MCPToolEnv, max_turns: int = 8) -> None:
+def run_episode(client: OpenAI, env: MCPToolEnv, max_turns: int = 8) -> Dict[str, Any]:
     observation, info = env.init()
     print("Episode task:", info.get("task_id"))
     done = False
     turn = 0
     total_reward = 0.0
+    steps: List[Dict[str, Any]] = []
+    final_metadata: Dict[str, Any] | None = None
 
     while not done and turn < max_turns:
         messages = to_openai_messages(observation)
@@ -135,10 +139,40 @@ def run_episode(client: OpenAI, env: MCPToolEnv, max_turns: int = 8) -> None:
             print("Episode finished. Final metadata:")
             print(json.dumps(metadata, indent=2))
 
+        steps.append(
+            {
+                "turn": turn + 1,
+                "messages": messages,
+                "action": action,
+                "reward": reward,
+                "cumulative_reward": total_reward,
+                "metadata": metadata,
+            }
+        )
+        final_metadata = metadata
         turn += 1
+
+    return {
+        "task_id": info.get("task_id"),
+        "max_turns": max_turns,
+        "total_reward": total_reward,
+        "terminated": done,
+        "num_steps": len(steps),
+        "steps": steps,
+        "final_metadata": final_metadata,
+    }
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Run a dry-run episode through MCPToolEnv")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Path to write JSON results. Defaults to runs/dry_runs/dry_run_<timestamp>.json",
+    )
+    args = parser.parse_args()
+
     load_env()
     client = OpenAI()
 
@@ -152,7 +186,18 @@ def main():
         tool_group = MCPToolGroup(manager)
         env = MCPToolEnv(sample, tool_group=tool_group, config=EnvironmentConfig())
         try:
-            run_episode(client, env, max_turns=sample["reward_spec"]["ground_truth"].get("max_turns", 8))
+            episode_result = run_episode(
+                client,
+                env,
+                max_turns=sample["reward_spec"]["ground_truth"].get("max_turns", 8),
+            )
+            output_path = args.output
+            if output_path is None:
+                stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+                output_path = ROOT / "runs" / "dry_runs" / f"dry_run_{stamp}.json"
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(json.dumps(episode_result, indent=2), encoding="utf-8")
+            print(f"\nSaved dry-run transcript to {output_path}")
         finally:
             env.close()
     finally:

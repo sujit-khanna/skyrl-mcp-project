@@ -56,7 +56,6 @@ class EnvironmentConfig:
     terminal_weights: TerminalRewardWeights = field(default_factory=lambda: TerminalRewardWeights())
     invalid_action_penalty: float = -0.05
     limit_violation_penalty: float = -0.3
-    missing_tool_penalty: float = -0.2
     tool_timeout: float = 30.0
     allowlist: Optional[Sequence[str]] = None
     auto_close_tool_group: bool = True
@@ -99,13 +98,31 @@ class MCPToolEnv(BaseTextEnv):
 
         plan_steps = self.ground.get("tool_sequence", [])
         self.plan_steps = list(plan_steps)
-        self.analysis_steps = {
-            step_info.get("step"): (step_info.get("analysis_requirements") or {})
-            for step_info in self.plan_steps
-        }
+
+        # Build analysis requirements from rubric first to ensure every step has directives
+        self.analysis_steps: Dict[int, Dict[str, Any]] = {}
         analysis_rubric = (self.ground.get("analysis_rubric") or {}).get("steps", [])
         for entry in analysis_rubric:
-            self.analysis_steps.setdefault(entry.get("step"), entry)
+            step_id = entry.get("step") if isinstance(entry, dict) else None
+            if step_id is None:
+                continue
+            ar = entry.get("analysis_requirements") if isinstance(entry, dict) else None
+            if isinstance(ar, dict):
+                self.analysis_steps[step_id] = ar
+            elif isinstance(entry, dict):
+                # fallback: entry itself is the analysis requirements block
+                self.analysis_steps[step_id] = entry
+            else:
+                self.analysis_steps[step_id] = {}
+
+        # Allow tool_sequence to override if it carries explicit analysis requirements
+        for step_info in self.plan_steps:
+            step_id = step_info.get("step")
+            if step_id is None:
+                continue
+            ar = step_info.get("analysis_requirements")
+            if isinstance(ar, dict) and ar:
+                self.analysis_steps[step_id] = ar
 
         self.step_lookup_by_tool = {}
         for step in self.plan_steps:
@@ -326,10 +343,6 @@ class MCPToolEnv(BaseTextEnv):
             "terminal_breakdown": terminal_breakdown,
             "success_called": success_called,
         }
-
-        if not success_called:
-            reward += self.config.missing_tool_penalty
-            metadata.setdefault("terminal_breakdown", {})["missing_tool_penalty"] = self.config.missing_tool_penalty
 
         return reward, metadata
 
